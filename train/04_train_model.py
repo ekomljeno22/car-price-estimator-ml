@@ -1,91 +1,114 @@
-import sys, os
-sys.path.insert(0, os.path.dirname(__file__))
-
-import numpy as np
-import json
-import pickle
-
+import numpy as np, json, pickle, os
+from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.neural_network import MLPRegressor
-from sklearn.metrics import mean_absolute_percentage_error
+from sklearn.metrics import mean_absolute_percentage_error, r2_score
 
 os.makedirs('models', exist_ok=True)
 os.makedirs('logs',   exist_ok=True)
 
-# ── Load hparams from 03 (single source of truth) ────────────────────────────
-try:
-    with open('logs/hparams.json') as f:
-        raw = json.load(f)
+# ── Učitaj podatke ─────────────────────────────────────────────────────────────
+X_train_hgb = np.load('data/X_train_hgb.npy')
+X_train_mlp = np.load('data/X_train_proc.npy')
+y_train     = np.load('data/y_train.npy')
+
+with open('data/pipeline_meta.pkl', 'rb') as f:
+    meta = pickle.load(f)
+cat_indices = meta['categorical_feature_indices']
+
+# ── Učitaj hparamove ──────────────────────────────────────────────────────────
+with open('logs/hgb_hparams.json') as f:
+    HGB_HPARAMS = json.load(f)
+with open('logs/mlp_hparams.json') as f:
+    raw = json.load(f)
     raw['hidden_layer_sizes'] = tuple(raw['hidden_layer_sizes'])
-    HPARAMS = raw
-    print("Loaded hparams from logs/hparams.json")
-except FileNotFoundError:
-    print("logs/hparams.json not found – using defaults. Run 03_build_model.py first.")
-    HPARAMS = dict(
-        hidden_layer_sizes=(512, 256, 128), activation='relu', solver='adam',
-        learning_rate_init=0.0005, alpha=0.01, batch_size=128, max_iter=600,
-        random_state=42, early_stopping=True, validation_fraction=0.1,
-        n_iter_no_change=25, verbose=False, warm_start=False,
-    )
+    MLP_HPARAMS = raw
 
-# ── Load data ─────────────────────────────────────────────────────────────────
-X_train_proc = np.load('data/X_train_proc.npy')
-y_train      = np.load('data/y_train.npy')
+# ── 1. Treniranje HGB modela ──────────────────────────────────────────────────
+print("=" * 65)
+print("Treniranje HistGradientBoostingRegressor (primarni model)")
+print("=" * 65)
+print(f"   Train matrix : {X_train_hgb.shape}")
+print(f"   Kategorički indeksi: {cat_indices}")
 
-# 💥 Učitavamo novostvorene težinske vektore iz koraka 1
-if os.path.exists('data/sample_weights.npy'):
-    sample_weights = np.load('data/sample_weights.npy')
-    print("Loaded sample weights for MAPE optimization.")
+hgb = HistGradientBoostingRegressor(
+    categorical_features=cat_indices,
+    **HGB_HPARAMS
+)
+hgb.fit(X_train_hgb, y_train)
+
+# Dohvaćanje predikcija i inverzija logaritma
+y_true_train = np.expm1(y_train)
+y_pred_hgb   = np.expm1(hgb.predict(X_train_hgb)).clip(min=0)
+
+mape_hgb     = mean_absolute_percentage_error(y_true_train, y_pred_hgb) * 100
+r2_hgb       = r2_score(y_true_train, y_pred_hgb)  # <-- POPRAVLJENO: proslijeđen y_pred_hgb u dolarima
+
+print(f"   Iteracije   : {hgb.n_iter_}")
+print(f"   Train MAPE  : {mape_hgb:.2f}%")
+print(f"   Train R²    : {r2_hgb:.4f}")  # <-- Ovo će sada biti visoko i pozitivno!
+
+with open('models/hgb_model.pkl', 'wb') as f:
+    pickle.dump(hgb, f)
+print("   Saved: models/hgb_model.pkl")
+
+# ── 2. Treniranje MLP modela ──────────────────────────────────────────────────
+print("\n" + "=" * 65)
+print("Treniranje MLPRegressor (sekundarni model, smanjen)")
+print("=" * 65)
+print(f"   Train matrix : {X_train_mlp.shape}")
+
+mlp = MLPRegressor(**MLP_HPARAMS)
+mlp.fit(X_train_mlp, y_train)
+
+# Dohvaćanje predikcija i inverzija logaritma
+y_pred_mlp = np.expm1(mlp.predict(X_train_mlp)).clip(min=0)
+
+mape_mlp   = mean_absolute_percentage_error(y_true_train, y_pred_mlp) * 100
+r2_mlp     = r2_score(y_true_train, y_pred_mlp)  # <-- POPRAVLJENO: proslijeđen y_pred_mlp u dolarima
+
+print(f"   Iteracije   : {mlp.n_iter_}")
+print(f"   Train MAPE  : {mape_mlp:.2f}%")
+print(f"   Train R²    : {r2_mlp:.4f}")
+
+with open('models/mlp_model.pkl', 'wb') as f:
+    pickle.dump(mlp, f)
+print("   Saved: models/mlp_model.pkl")
+
+# ── Odabir boljeg modela ──────────────────────────────────────────────────────
+print("\n" + "=" * 65)
+if mape_hgb <= mape_mlp:
+    best_name = 'HistGradientBoosting'
+    with open('models/hgb_model.pkl', 'rb') as f:
+        best = pickle.load(f)
 else:
-    sample_weights = None
+    best_name = 'MLP'
+    with open('models/mlp_model.pkl', 'rb') as f:
+        best = pickle.load(f)
 
-print("=" * 60)
-print("Training Neural Network Model")
-print("=" * 60)
-print(f"Training matrix : {X_train_proc.shape}")
-print(f"Target vector   : {y_train.shape}")
-print(f"Hparams         : {HPARAMS}")
-print("=" * 60)
-
-model = MLPRegressor(**HPARAMS)
-
-print("\nStarting training with sample weights…")
-# 💥 PROMJENA: Dodajemo sample_weight u proces treniranja
-if sample_weights is not None:
-    model.fit(X_train_proc, y_train, sample_weight=sample_weights)
-else:
-    model.fit(X_train_proc, y_train)
-
-# ── Post-training report ──────────────────────────────────────────────────────
-print("\n" + "=" * 60)
-print("Training complete")
-print("=" * 60)
-print(f"Iterations run  : {model.n_iter_}")
-print(f"Final train loss: {model.loss_:.6f}")
-early = model.n_iter_ < model.max_iter
-print(f"Early stopping  : {'YES – triggered' if early else 'NO – hit max_iter'}")
-
-# 💥 MAPE OPTIMIZATION: Applying asymmetric MAPE deflation logic to training check
-y_pred_log = model.predict(X_train_proc)
-y_pred_train = np.expm1(y_pred_log).clip(min=0) * 0.965
-mape_train = mean_absolute_percentage_error(np.expm1(y_train), y_pred_train) * 100
-print(f"Train MAPE (actual $): {mape_train:.2f}%")
-
-# ── Persist ───────────────────────────────────────────────────────────────────
+print(f"Bolji model: {best_name}  (MAPE HGB={mape_hgb:.2f}%, MLP={mape_mlp:.2f}%)")
 with open('models/best_model.pkl', 'wb') as f:
-    pickle.dump(model, f)
+    pickle.dump({'model': best, 'type': best_name}, f)
 
+# ── Spremi history ────────────────────────────────────────────────────────────
 history = {
-    'final_loss':       float(model.loss_),
-    'n_iterations':     int(model.n_iter_),
-    'training_samples': int(X_train_proc.shape[0]),
-    'model_type':       'MLPRegressor (scikit-learn)',
-    'hidden_layers':    list(model.hidden_layer_sizes),
-    'train_mape':       round(mape_train, 4),
-    'loss_curve':       [float(v) for v in model.loss_curve_],
-    'val_loss_curve':   [float(v) for v in (model.validation_scores_
-                          if hasattr(model, 'validation_scores_') else [])],
+    'best_model':        best_name,
+    'hgb_n_iterations':  int(hgb.n_iter_),
+    'hgb_train_mape':    round(float(mape_hgb), 4),
+    'hgb_train_r2':      round(float(r2_hgb), 4),
+    'mlp_n_iterations':  int(mlp.n_iter_),
+    'mlp_final_loss':    float(mlp.loss_),
+    'mlp_train_mape':    round(float(mape_mlp), 4),
+    'mlp_train_r2':      round(float(r2_mlp), 4),
+    'training_samples':  int(X_train_hgb.shape[0]),
+    'loss_curve':        [float(v) for v in mlp.loss_curve_],
+    'val_loss_curve':    [float(v) for v in getattr(mlp, 'validation_scores_', [])],
+    # Backwards compat polja za 06_visualize_curves.py
+    'final_loss':        float(mlp.loss_),
+    'n_iterations':      int(hgb.n_iter_),
+    'model_type':        f'HistGBM + MLP, best={best_name}',
+    'hidden_layers':     list(MLP_HPARAMS['hidden_layer_sizes']),
+    'train_mape':        round(float(min(mape_hgb, mape_mlp)), 4),
 }
-
 with open('logs/training_history.json', 'w') as f:
     json.dump(history, f, indent=2)
 
