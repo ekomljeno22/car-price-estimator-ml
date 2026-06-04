@@ -3,132 +3,327 @@
         xmlns:vm="using:UsedCarsApp.ViewModels"
         x:Class="UsedCarsApp.Views.MainWindow"
         x:DataType="vm:MainViewModel"
-        Title="Used Car Price Predictor"
+        Title="AutoVal · Used Car Price Estimator"
         WindowState="Maximized"
-        Background="#F1F5F9">
+        WindowStartupLocation="CenterScreen"
+        Background="#0A0F1E">
 
-    <Window.DataContext>
-        <Binding Path="Main" Source="{ReflectionBinding $parent[Application].DataContext}"/>
-    </Window.DataContext>
+    <Window.Styles>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <StackPanel MaxWidth="1200" Margin="40 30" Spacing="24">
+        <!-- ── Globalni font ───────────────────────────────────────── -->
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="'Segoe UI', 'SF Pro Display', sans-serif" />
+            <Setter Property="Foreground"  Value="#E2E8F0" />
+        </Style>
 
-            <Border CornerRadius="16" Padding="32 24" BoxShadow="0 4 18 0 #20000000">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                        <GradientStop Offset="0" Color="#1E40AF" />
-                        <GradientStop Offset="1" Color="#2563EB" />
-                    </LinearGradientBrush>
-                </Border.Background>
+        <!-- ── Label iznad fielda ─────────────────────────────────── -->
+        <Style Selector="TextBlock.label">
+            <Setter Property="FontSize"   Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#64748B" />
+            <Setter Property="Margin"     Value="0 0 0 6" />
+            <Setter Property="LetterSpacing" Value="1.5" />
+        </Style>
 
-                <Grid ColumnDefinitions="*, Auto">
-                    <StackPanel Spacing="6" Grid.Column="0">
-                        <TextBlock Text="🚗  Used Car Price Predictor"
-                                   FontSize="26" FontWeight="Heavy"
-                                   Foreground="White" LetterSpacing="0.5" />
-                        <TextBlock Text="Advanced ML-powered estimation engine using deep neural networks"
-                                   FontSize="14" Foreground="#93C5FD" />
-                    </StackPanel>
-                    <Border Grid.Column="1" Background="#3B82F6" CornerRadius="8" Padding="12 6" VerticalAlignment="Center">
-                        <TextBlock Text="v2.0 Live" Foreground="White" FontWeight="SemiBold" FontSize="12"/>
-                    </Border>
-                </Grid>
-            </Border>
+        <!-- ── ComboBox ───────────────────────────────────────────── -->
+        <Style Selector="ComboBox">
+            <Setter Property="Background"           Value="#111827" />
+            <Setter Property="BorderBrush"          Value="#1E293B" />
+            <Setter Property="BorderThickness"      Value="1" />
+            <Setter Property="Foreground"           Value="#E2E8F0" />
+            <Setter Property="Height"               Value="44" />
+            <Setter Property="CornerRadius"         Value="8" />
+            <Setter Property="Padding"              Value="12 0" />
+            <Setter Property="HorizontalAlignment"  Value="Stretch" />
+        </Style>
+        <Style Selector="ComboBox:pointerover">
+            <Setter Property="BorderBrush" Value="#3B82F6" />
+        </Style>
+        <Style Selector="ComboBox:focus">
+            <Setter Property="BorderBrush" Value="#3B82F6" />
+        </Style>
 
-            <Grid ColumnDefinitions="*, 32, 400" HorizontalAlignment="Stretch">
-                
-                <Border Grid.Column="0" Background="White" CornerRadius="16"
-                        BoxShadow="0 4 20 0 #0F000000" Padding="32">
-                    <StackPanel Spacing="20">
-                        <TextBlock Text="Vehicle Specifications" FontSize="18" FontWeight="Bold" Foreground="#1E293B" Margin="0 0 0 10"/>
-                        
-                        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
-                              ColumnDefinitions="*, 24, *">
+        <!-- ── NumericUpDown ──────────────────────────────────────── -->
+        <Style Selector="NumericUpDown">
+            <Setter Property="Background"      Value="#111827" />
+            <Setter Property="BorderBrush"     Value="#1E293B" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground"      Value="#E2E8F0" />
+            <Setter Property="Height"          Value="44" />
+            <Setter Property="CornerRadius"    Value="8" />
+        </Style>
+        <Style Selector="NumericUpDown:pointerover">
+            <Setter Property="BorderBrush" Value="#3B82F6" />
+        </Style>
 
-                            <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6" Margin="0 0 0 16">
-                                <TextBlock Text="Model Year" FontWeight="SemiBold" FontSize="13" Foreground="#475569" />
-                                <NumericUpDown Value="{Binding ModelYear}" Minimum="1990" Maximum="2026" FormatString="0" />
+    </Window.Styles>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         ROOT: dva stupca – lijeva sidebar + desni sadržaj
+    ══════════════════════════════════════════════════════════════ -->
+    <Grid ColumnDefinitions="320,*">
+
+        <!-- ══════════════════════════════════════════
+             LIJEVA SIDEBAR – brend / naslov / info
+        ═══════════════════════════════════════════ -->
+        <Border Grid.Column="0"
+                Background="#060D1A"
+                Padding="36 48 36 36">
+            <DockPanel>
+
+                <!-- Logo + naslov -->
+                <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="0 0 0 48">
+                    <TextBlock Text="AUTO"
+                               FontSize="11" FontWeight="Bold"
+                               Foreground="#3B82F6"
+                               LetterSpacing="4" />
+                    <TextBlock Text="VAL"
+                               FontSize="42" FontWeight="ExtraBold"
+                               Foreground="#F1F5F9"
+                               LineHeight="40" />
+                    <Rectangle Height="2" Width="48"
+                               Fill="#3B82F6"
+                               HorizontalAlignment="Left"
+                               Margin="0 8 0 0" />
+                    <TextBlock Text="AI Price Estimator"
+                               FontSize="13" Foreground="#475569"
+                               Margin="0 8 0 0" />
+                </StackPanel>
+
+                <!-- Status badge -->
+                <Border DockPanel.Dock="Bottom"
+                        Background="#0F172A"
+                        CornerRadius="10"
+                        Padding="14 12"
+                        Margin="0 0 0 0">
+                    <StackPanel Spacing="10">
+
+                        <!-- Indikator učitavanja modela -->
+                        <StackPanel Orientation="Horizontal" Spacing="8"
+                                    IsVisible="{Binding IsLoadingModels}">
+                            <Ellipse Width="7" Height="7" Fill="#F59E0B" />
+                            <TextBlock Text="Učitavam modele…"
+                                       FontSize="12" Foreground="#94A3B8" />
+                        </StackPanel>
+
+                        <!-- Status poruka -->
+                        <TextBlock Text="{Binding StatusMessage}"
+                                   FontSize="12" Foreground="#64748B"
+                                   TextWrapping="Wrap"
+                                   IsVisible="{Binding !IsLoadingModels}" />
+
+                        <!-- Error badge -->
+                        <Border IsVisible="{Binding HasError}"
+                                Background="#1A0A0A" CornerRadius="6"
+                                Padding="10 8">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Ellipse Width="6" Height="6" Fill="#EF4444" />
+                                <TextBlock Text="Greška – provjeri servise"
+                                           FontSize="11" Foreground="#EF4444" />
                             </StackPanel>
-
-                            <StackPanel Grid.Row="0" Grid.Column="2" Spacing="6" Margin="0 0 0 16">
-                                <TextBlock Text="Mileage (mi)" FontWeight="SemiBold" FontSize="13" Foreground="#475569" />
-                                <NumericUpDown Value="{Binding Milage}" Minimum="0" Maximum="999999" FormatString="0" Increment="5000" />
-                            </StackPanel>
-
-                            <StackPanel Grid.Row="2" Grid.Column="0" Spacing="6" Margin="0 0 0 16">
-                                <TextBlock Text="Brand" FontWeight="SemiBold" FontSize="13" Foreground="#475569" />
-                                <ComboBox ItemsSource="{Binding Brands}" SelectedItem="{Binding SelectedBrand}" HorizontalAlignment="Stretch" />
-                            </StackPanel>
-
-                            <StackPanel Grid.Row="2" Grid.Column="2" Spacing="6" Margin="0 0 0 16">
-                                <TextBlock Text="Model" FontWeight="SemiBold" FontSize="13" Foreground="#475569" />
-                                <ComboBox ItemsSource="{Binding CarModels}" SelectedItem="{Binding SelectedCarModel}" HorizontalAlignment="Stretch" />
-                            </StackPanel>
-
-                            <StackPanel Grid.Row="4" Grid.Column="0" Spacing="6" Margin="0 0 0 16">
-                                <TextBlock Text="Fuel Type" FontWeight="SemiBold" FontSize="13" Foreground="#475569" />
-                                <ComboBox ItemsSource="{Binding FuelTypes}" SelectedItem="{Binding SelectedFuelType}" HorizontalAlignment="Stretch" />
-                            </StackPanel>
-
-                            <StackPanel Grid.Row="4" Grid.Column="2" Spacing="6" Margin="0 0 0 16">
-                                <TextBlock Text="Transmission" FontWeight="SemiBold" FontSize="13" Foreground="#475569" />
-                                <ComboBox ItemsSource="{Binding Transmissions}" SelectedItem="{Binding SelectedTransmission}" HorizontalAlignment="Stretch" />
-                            </StackPanel>
-
-                            <StackPanel Grid.Row="6" Grid.Column="0" Spacing="6">
-                                <TextBlock Text="Prior Accident" FontWeight="SemiBold" FontSize="13" Foreground="#475569" />
-                                <ComboBox ItemsSource="{Binding Accidents}" SelectedItem="{Binding SelectedAccident}" HorizontalAlignment="Stretch" />
-                            </StackPanel>
-
-                            <StackPanel Grid.Row="6" Grid.Column="2" Spacing="6">
-                                <TextBlock Text="Clean Title" FontWeight="SemiBold" FontSize="13" Foreground="#475569" />
-                                <ComboBox ItemsSource="{Binding CleanTitles}" SelectedItem="{Binding SelectedCleanTitle}" HorizontalAlignment="Stretch" />
-                            </StackPanel>
-                        </Grid>
+                        </Border>
                     </StackPanel>
                 </Border>
 
-                <StackPanel Grid.Column="2" Spacing="20" VerticalAlignment="Top">
-                    
-                    <Border CornerRadius="12" BoxShadow="0 4 14 0 #402563EB">
-                        <Button Command="{Binding PredictCommand}"
-                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                                Height="56" Background="#2563EB" Foreground="White"
-                                FontSize="16" FontWeight="Bold" CornerRadius="12">
-                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                <PathIcon Data="M12 2A10 10 0 0 0 2 12A10 10 0 0 0 12 22A10 10 0 0 0 22 12A10 10 0 0 0 12 2M12 4A8 8 0 0 1 20 12A8 8 0 0 1 12 20A8 8 0 0 1 4 12A8 8 0 0 1 12 4M11 6V13H16V11H13V6H11Z" 
-                                          Width="16" Height="16" Foreground="White" IsVisible="{Binding !IsBusy}"/>
-                                <TextBlock IsVisible="{Binding !IsBusy}" Text="Calculate Valuation" VerticalAlignment="Center"/>
-                                <TextBlock IsVisible="{Binding IsBusy}"  Text="Running Valuation Model…" VerticalAlignment="Center" />
-                            </StackPanel>
-                        </Button>
-                    </Border>
+                <!-- Spacer -->
+                <StackPanel DockPanel.Dock="Top" Spacing="32">
 
-                    <Border Background="White" CornerRadius="16" BoxShadow="0 4 20 0 #0F000000" Padding="28">
-                        <StackPanel Spacing="12" HorizontalAlignment="Center">
-                            <TextBlock Text="ESTIMATED VALUE" FontSize="12" FontWeight="Heavy" 
-                                       Foreground="#64748B" HorizontalAlignment="Center" LetterSpacing="1.2"/>
-                            
-                            <TextBlock Text="{Binding PredictedPrice}" FontSize="46" FontWeight="Black" 
-                                       HorizontalAlignment="Center" Foreground="#16A34A" />
-                            
-                            <Border Background="#F0FDF4" CornerRadius="20" Padding="12 4" HorizontalAlignment="Center">
-                                <TextBlock Text="✓ AI Verified Estimate" FontSize="11" Foreground="#16A34A" FontWeight="Medium"/>
+                    <!-- ── Procijenjena cijena (veliki prikaz) ── -->
+                    <StackPanel Spacing="8">
+                        <TextBlock Classes="label" Text="PROCIJENJENA CIJENA" />
+                        <TextBlock Text="{Binding PredictedPrice}"
+                                   FontSize="44" FontWeight="ExtraBold"
+                                   Foreground="#3B82F6"
+                                   LineHeight="48" />
+                    </StackPanel>
+
+                    <!-- Divider -->
+                    <Rectangle Height="1" Fill="#1E293B" />
+
+                    <!-- ── Info kartice ── -->
+                    <StackPanel Spacing="12">
+                        <TextBlock Classes="label" Text="MODEL INFO" />
+
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto"
+                              HorizontalAlignment="Stretch">
+                            <!-- Brand prikaz -->
+                            <Border Grid.Row="0" Grid.Column="0"
+                                    Background="#0F172A" CornerRadius="8"
+                                    Padding="12 10" Margin="0 0 6 6">
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="BRAND" FontSize="9"
+                                               Foreground="#475569" LetterSpacing="1.5" />
+                                    <TextBlock Text="{Binding SelectedBrand, FallbackValue='—'}"
+                                               FontSize="14" FontWeight="SemiBold"
+                                               Foreground="#CBD5E1" />
+                                </StackPanel>
                             </Border>
-                        </StackPanel>
-                    </Border>
-
-                    <Border CornerRadius="12" Padding="16 12" Background="#E2E8F0">
-                        <Grid ColumnDefinitions="Auto, *">
-                            <TextBlock Text="ℹ " FontSize="14" Foreground="#475569" Grid.Column="0" Margin="0 0 8 0"/>
-                            <TextBlock Text="{Binding StatusMessage}" FontSize="12" Foreground="#475569" 
-                                       TextWrapping="Wrap" Grid.Column="1" VerticalAlignment="Center"/>
+                            <!-- Model prikaz -->
+                            <Border Grid.Row="0" Grid.Column="1"
+                                    Background="#0F172A" CornerRadius="8"
+                                    Padding="12 10" Margin="6 0 0 6">
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="MODEL" FontSize="9"
+                                               Foreground="#475569" LetterSpacing="1.5" />
+                                    <TextBlock Text="{Binding SelectedCarModel, FallbackValue='—'}"
+                                               FontSize="14" FontWeight="SemiBold"
+                                               Foreground="#CBD5E1"
+                                               TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </Border>
+                            <!-- Godina prikaz -->
+                            <Border Grid.Row="1" Grid.Column="0"
+                                    Background="#0F172A" CornerRadius="8"
+                                    Padding="12 10" Margin="0 0 6 0">
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="GODINA" FontSize="9"
+                                               Foreground="#475569" LetterSpacing="1.5" />
+                                    <TextBlock Text="{Binding ModelYear}"
+                                               FontSize="14" FontWeight="SemiBold"
+                                               Foreground="#CBD5E1" />
+                                </StackPanel>
+                            </Border>
+                            <!-- Milja prikaz -->
+                            <Border Grid.Row="1" Grid.Column="1"
+                                    Background="#0F172A" CornerRadius="8"
+                                    Padding="12 10" Margin="6 0 0 0">
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="MILJE" FontSize="9"
+                                               Foreground="#475569" LetterSpacing="1.5" />
+                                    <TextBlock Text="{Binding Milage, StringFormat='{}{0:N0}'}"
+                                               FontSize="14" FontWeight="SemiBold"
+                                               Foreground="#CBD5E1" />
+                                </StackPanel>
+                            </Border>
                         </Grid>
-                    </Border>
-                    
+                    </StackPanel>
+
                 </StackPanel>
-            </Grid>
-        </StackPanel>
-    </ScrollViewer>
+
+            </DockPanel>
+        </Border>
+
+        <!-- ══════════════════════════════════════════
+             DESNA STRANA – form
+        ═══════════════════════════════════════════ -->
+        <ScrollViewer Grid.Column="1"
+                      VerticalScrollBarVisibility="Auto"
+                      Padding="0">
+            <StackPanel Margin="48 48 48 48" Spacing="0">
+
+                <!-- Naslov sekcije -->
+                <StackPanel Spacing="4" Margin="0 0 0 36">
+                    <TextBlock Text="Unesi podatke o vozilu"
+                               FontSize="28" FontWeight="Bold"
+                               Foreground="#F1F5F9" />
+                    <TextBlock Text="Ispuni polja za preciznu procjenu tržišne vrijednosti."
+                               FontSize="14" Foreground="#475569" />
+                </StackPanel>
+
+                <!-- ── Sekcija: Osnovno ─────────────────────────────── -->
+                <TextBlock Classes="label" Text="OSNOVNO" Margin="0 0 0 12" />
+                <Border Background="#0F172A" CornerRadius="12"
+                        Padding="24" Margin="0 0 0 24">
+                    <Grid ColumnDefinitions="*,20,*" RowDefinitions="Auto,Auto,Auto,Auto">
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Classes="label" Text="MARKA (BRAND)" />
+                        <ComboBox  Grid.Row="1" Grid.Column="0"
+                                   ItemsSource="{Binding Brands}"
+                                   SelectedItem="{Binding SelectedBrand}"
+                                   Margin="0 0 0 20" />
+
+                        <Grid Grid.Row="0" Grid.Column="2" ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="label" Text="MODEL" />
+                            <TextBlock Grid.Column="1"
+                                       Text="učitavam…" FontSize="10"
+                                       Foreground="#F59E0B"
+                                       IsVisible="{Binding IsLoadingModels}"
+                                       VerticalAlignment="Center" />
+                        </Grid>
+                        <ComboBox  Grid.Row="1" Grid.Column="2"
+                                   ItemsSource="{Binding CarModels}"
+                                   SelectedItem="{Binding SelectedCarModel}"
+                                   IsEnabled="{Binding !IsLoadingModels}"
+                                   Margin="0 0 0 20" />
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Classes="label" Text="GODINA MODELA" />
+                        <NumericUpDown Grid.Row="3" Grid.Column="0"
+                                       Value="{Binding ModelYear}"
+                                       Minimum="1990" Maximum="2025"
+                                       FormatString="0" />
+
+                        <TextBlock Grid.Row="2" Grid.Column="2" Classes="label" Text="KILOMETRAŽA (MI)" />
+                        <NumericUpDown Grid.Row="3" Grid.Column="2"
+                                       Value="{Binding Milage}"
+                                       Minimum="0" Maximum="999999"
+                                       FormatString="0" Increment="5000" />
+                    </Grid>
+                </Border>
+
+                <!-- ── Sekcija: Pogon ───────────────────────────────── -->
+                <TextBlock Classes="label" Text="POGON I MJENJAČ" Margin="0 0 0 12" />
+                <Border Background="#0F172A" CornerRadius="12"
+                        Padding="24" Margin="0 0 0 24">
+                    <Grid ColumnDefinitions="*,20,*" RowDefinitions="Auto,Auto">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Classes="label" Text="VRSTA GORIVA" />
+                        <ComboBox  Grid.Row="1" Grid.Column="0"
+                                   ItemsSource="{Binding FuelTypes}"
+                                   SelectedItem="{Binding SelectedFuelType}" />
+
+                        <TextBlock Grid.Row="0" Grid.Column="2" Classes="label" Text="MJENJAČ" />
+                        <ComboBox  Grid.Row="1" Grid.Column="2"
+                                   ItemsSource="{Binding Transmissions}"
+                                   SelectedItem="{Binding SelectedTransmission}" />
+                    </Grid>
+                </Border>
+
+                <!-- ── Sekcija: Povijest ────────────────────────────── -->
+                <TextBlock Classes="label" Text="POVIJEST VOZILA" Margin="0 0 0 12" />
+                <Border Background="#0F172A" CornerRadius="12"
+                        Padding="24" Margin="0 0 0 36">
+                    <Grid ColumnDefinitions="*,20,*" RowDefinitions="Auto,Auto">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Classes="label" Text="NEZGODE" />
+                        <ComboBox  Grid.Row="1" Grid.Column="0"
+                                   ItemsSource="{Binding Accidents}"
+                                   SelectedItem="{Binding SelectedAccident}" />
+
+                        <TextBlock Grid.Row="0" Grid.Column="2" Classes="label" Text="ČIST PAPIR" />
+                        <ComboBox  Grid.Row="1" Grid.Column="2"
+                                   ItemsSource="{Binding CleanTitles}"
+                                   SelectedItem="{Binding SelectedCleanTitle}" />
+                    </Grid>
+                </Border>
+
+                <!-- ── Predict button ───────────────────────────────── -->
+                <Button Command="{Binding PredictCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Height="56"
+                        CornerRadius="12"
+                        Cursor="Hand">
+                    <Button.Background>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                            <GradientStop Color="#2563EB" Offset="0" />
+                            <GradientStop Color="#7C3AED" Offset="1" />
+                        </LinearGradientBrush>
+                    </Button.Background>
+                    <Button.Foreground>
+                        <SolidColorBrush Color="White" />
+                    </Button.Foreground>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock IsVisible="{Binding !IsBusy}"
+                                   Text="Procijeni cijenu →"
+                                   FontSize="16" FontWeight="SemiBold"
+                                   Foreground="White" />
+                        <TextBlock IsVisible="{Binding IsBusy}"
+                                   Text="Računam…"
+                                   FontSize="16" FontWeight="SemiBold"
+                                   Foreground="White" />
+                    </StackPanel>
+                </Button>
+
+            </StackPanel>
+        </ScrollViewer>
+
+    </Grid>
 </Window>

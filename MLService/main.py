@@ -155,3 +155,28 @@ def options():
         "brands":        sorted(brands),
         "models":        sorted(models),
     }
+
+@app.get("/models-for-brand/{brand}")
+def models_for_brand(brand: str):
+    """Vraća samo modele koji postoje za zadani brand."""
+    if TE_MAPS is None:
+        raise HTTPException(status_code=503, detail="Model not loaded.")
+ 
+    brand_model_map: dict = TE_MAPS.get("brand_model_map", {})
+ 
+    # Tražimo brand case-insensitive
+    models = brand_model_map.get(brand)
+    if models is None:
+        # Pokušaj case-insensitive lookup
+        for key in brand_model_map:
+            if key.lower() == brand.lower():
+                models = brand_model_map[key]
+                break
+ 
+    if models is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Brand '{brand}' not found. Run export_te_maps.py to rebuild maps."
+        )
+ 
+    return {"brand": brand, "models": sorted(models)}

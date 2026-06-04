@@ -4,13 +4,11 @@ using UsedCarsApi.Models;
 
 namespace UsedCarsApi.Services;
 
-/// <summary>
-/// Thin proxy that forwards requests to the Python FastAPI ML microservice.
-/// </summary>
 public interface ICarPredictionService
 {
-    Task<PredictResponse?> PredictAsync(PredictRequest request, CancellationToken ct = default);
-    Task<CarOptions?>      GetOptionsAsync(CancellationToken ct = default);
+    Task<PredictResponse?>      PredictAsync(PredictRequest request, CancellationToken ct = default);
+    Task<CarOptions?>           GetOptionsAsync(CancellationToken ct = default);
+    Task<BrandModelsResponse?>  GetModelsForBrandAsync(string brand, CancellationToken ct = default);
 }
 
 public sealed class CarPredictionService(HttpClient http) : ICarPredictionService
@@ -22,8 +20,7 @@ public sealed class CarPredictionService(HttpClient http) : ICarPredictionServic
 
     public async Task<PredictResponse?> PredictAsync(PredictRequest request, CancellationToken ct = default)
     {
-        // Map C# PascalCase to Python snake_case
-        var mlPayload = new
+        var payload = new
         {
             model_year   = request.ModelYear,
             milage       = request.Milage,
@@ -35,13 +32,11 @@ public sealed class CarPredictionService(HttpClient http) : ICarPredictionServic
             model        = request.Model
         };
 
-        var response = await http.PostAsJsonAsync("/predict", mlPayload, ct);
+        var response = await http.PostAsJsonAsync("/predict", payload, ct);
         response.EnsureSuccessStatusCode();
 
         var ml = await response.Content.ReadFromJsonAsync<MlPredictResponse>(_opts, ct);
-        if (ml is null) return null;
-
-        return new PredictResponse(ml.predicted_price, ml.predicted_price_formatted);
+        return ml is null ? null : new PredictResponse(ml.predicted_price, ml.predicted_price_formatted);
     }
 
     public async Task<CarOptions?> GetOptionsAsync(CancellationToken ct = default)
@@ -57,5 +52,13 @@ public sealed class CarPredictionService(HttpClient http) : ICarPredictionServic
             ml.brands,
             ml.models
         );
+    }
+
+    public async Task<BrandModelsResponse?> GetModelsForBrandAsync(string brand, CancellationToken ct = default)
+    {
+        var encoded  = Uri.EscapeDataString(brand);
+        var ml       = await http.GetFromJsonAsync<MlBrandModelsResponse>(
+                           $"/models-for-brand/{encoded}", _opts, ct);
+        return ml is null ? null : new BrandModelsResponse(ml.brand, ml.models);
     }
 }

@@ -7,8 +7,9 @@ namespace UsedCarsApp.Services;
 
 public interface ICarApiService
 {
-    Task<PredictResponse?> PredictAsync(PredictRequest request, CancellationToken ct = default);
-    Task<CarOptions?>      GetOptionsAsync(CancellationToken ct = default);
+    Task<PredictResponse?>      PredictAsync(PredictRequest request, CancellationToken ct = default);
+    Task<CarOptions?>           GetOptionsAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<string>> GetModelsForBrandAsync(string brand, CancellationToken ct = default);
 }
 
 public sealed class CarApiService : ICarApiService
@@ -36,4 +37,12 @@ public sealed class CarApiService : ICarApiService
 
     public async Task<CarOptions?> GetOptionsAsync(CancellationToken ct = default)
         => await _http.GetFromJsonAsync<CarOptions>("/api/cars/options", _opts, ct);
+
+    public async Task<IReadOnlyList<string>> GetModelsForBrandAsync(string brand, CancellationToken ct = default)
+    {
+        var encoded  = Uri.EscapeDataString(brand);
+        var response = await _http.GetFromJsonAsync<BrandModelsResponse>(
+                           $"/api/cars/models-for-brand/{encoded}", _opts, ct);
+        return response?.Models ?? [];
+    }
 }

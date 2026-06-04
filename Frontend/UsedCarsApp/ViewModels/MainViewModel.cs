@@ -10,13 +10,15 @@ public partial class MainViewModel : ObservableObject
 {
     private readonly ICarApiService _api;
 
-    // ── Dropdown option collections ───────────────────────────────────────────
+    // ── Dropdown kolekcije ────────────────────────────────────────────────────
     public ObservableCollection<string> FuelTypes     { get; } = [];
     public ObservableCollection<string> Transmissions { get; } = [];
     public ObservableCollection<string> Accidents     { get; } = [];
     public ObservableCollection<string> CleanTitles   { get; } = [];
     public ObservableCollection<string> Brands        { get; } = [];
-    public ObservableCollection<string> CarModels     { get; } = [];
+
+    // CarModels je ODVOJEN od ostalih – puni se dinamički po odabranom brandu
+    public ObservableCollection<string> CarModels { get; } = [];
 
     // ── Input fields ──────────────────────────────────────────────────────────
     [ObservableProperty] private int    _modelYear    = DateTime.Now.Year - 3;
@@ -29,16 +31,36 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _selectedCarModel     = string.Empty;
 
     // ── Output / status ───────────────────────────────────────────────────────
-    [ObservableProperty] private string _predictedPrice    = "—";
-    [ObservableProperty] private string _statusMessage     = "Loading options…";
+    [ObservableProperty] private string _predictedPrice = "—";
+    [ObservableProperty] private string _statusMessage  = "Učitavanje opcija…";
     [ObservableProperty] private bool   _isBusy;
     [ObservableProperty] private bool   _hasError;
+    [ObservableProperty] private bool   _isLoadingModels;
 
     public MainViewModel(ICarApiService api)
     {
         _api = api;
         _ = LoadOptionsAsync();
     }
+
+    // ── Kad se brand promijeni → učitaj filtrirane modele ────────────────────
+    partial void OnSelectedBrandChanged(string value)
+    {
+        PredictCommand.NotifyCanExecuteChanged();
+
+        // Prazni modele odmah da korisnik ne može slučajno odabrati krivi model
+        CarModels.Clear();
+        SelectedCarModel = string.Empty;
+
+        if (!string.IsNullOrEmpty(value))
+            _ = LoadModelsForBrandAsync(value);
+    }
+
+    partial void OnSelectedCarModelChanged(string value) =>
+        PredictCommand.NotifyCanExecuteChanged();
+
+    partial void OnIsBusyChanged(bool value) =>
+        PredictCommand.NotifyCanExecuteChanged();
 
     // ── Commands ──────────────────────────────────────────────────────────────
 
@@ -47,7 +69,7 @@ public partial class MainViewModel : ObservableObject
     {
         IsBusy    = true;
         HasError  = false;
-        StatusMessage = "Predicting…";
+        StatusMessage = "Predviđam cijenu…";
 
         try
         {
@@ -66,19 +88,19 @@ public partial class MainViewModel : ObservableObject
             if (result is not null)
             {
                 PredictedPrice = result.PredictedPriceFormatted;
-                StatusMessage  = "Prediction complete.";
+                StatusMessage  = "Predviđanje završeno.";
             }
             else
             {
                 PredictedPrice = "N/A";
-                StatusMessage  = "No result returned.";
+                StatusMessage  = "Servis nije vratio rezultat.";
             }
         }
         catch (Exception ex)
         {
             HasError       = true;
-            PredictedPrice = "Error";
-            StatusMessage  = $"Error: {ex.Message}";
+            PredictedPrice = "Greška";
+            StatusMessage  = $"Greška: {ex.Message}";
         }
         finally
         {
@@ -91,13 +113,7 @@ public partial class MainViewModel : ObservableObject
         !string.IsNullOrEmpty(SelectedBrand) &&
         !string.IsNullOrEmpty(SelectedCarModel);
 
-    // Keep CanExecute in sync with relevant property changes
-    partial void OnSelectedBrandChanged(string value)    => PredictCommand.NotifyCanExecuteChanged();
-    partial void OnSelectedCarModelChanged(string value) => PredictCommand.NotifyCanExecuteChanged();
-    partial void OnIsBusyChanged(bool value)             => PredictCommand.NotifyCanExecuteChanged();
-
-    // ── Options loader ────────────────────────────────────────────────────────
-
+    // ── Učitaj inicijalne opcije (brandovi, fuel, transmission…) ─────────────
     private async Task LoadOptionsAsync()
     {
         try
@@ -110,21 +126,56 @@ public partial class MainViewModel : ObservableObject
             Populate(Accidents,     options.Accidents);
             Populate(CleanTitles,   options.CleanTitles);
             Populate(Brands,        options.Brands);
-            Populate(CarModels,     options.Models);
 
             SelectedFuelType     = FuelTypes.FirstOrDefault("gas");
             SelectedTransmission = Transmissions.FirstOrDefault("automatic");
             SelectedAccident     = Accidents.FirstOrDefault("None");
             SelectedCleanTitle   = CleanTitles.FirstOrDefault("Yes");
-            SelectedBrand        = Brands.FirstOrDefault(string.Empty) ?? string.Empty;
-            SelectedCarModel     = CarModels.FirstOrDefault(string.Empty) ?? string.Empty;
 
-            StatusMessage = "Ready. Fill in the form and click Predict.";
+            // Postavljanje prvog branda triggerat će OnSelectedBrandChanged
+            // koji će automatski učitati modele za taj brand
+            if (Brands.Count > 0)
+                SelectedBrand = Brands[0];
+
+            StatusMessage = "Odaberi brand i model automobila.";
         }
         catch (Exception ex)
         {
             HasError      = true;
-            StatusMessage = $"Could not load options: {ex.Message}";
+            StatusMessage = $"Greška pri učitavanju opcija: {ex.Message}";
+        }
+    }
+
+    // ── Učitaj modele za odabrani brand ───────────────────────────────────────
+    private async Task LoadModelsForBrandAsync(string brand)
+    {
+        IsLoadingModels = true;
+        StatusMessage   = $"Učitavam modele za {brand}…";
+
+        try
+        {
+            var models = await _api.GetModelsForBrandAsync(brand);
+
+            CarModels.Clear();
+            foreach (var m in models)
+                CarModels.Add(m);
+
+            // Automatski odaberi prvi model
+            SelectedCarModel = CarModels.Count > 0 ? CarModels[0] : string.Empty;
+
+            StatusMessage = CarModels.Count > 0
+                ? $"{CarModels.Count} modela za {brand}. Klikni Predvidi."
+                : $"Nema modela za brand '{brand}'.";
+        }
+        catch (Exception ex)
+        {
+            HasError      = true;
+            StatusMessage = $"Greška pri učitavanju modela: {ex.Message}";
+        }
+        finally
+        {
+            IsLoadingModels = false;
+            PredictCommand.NotifyCanExecuteChanged();
         }
     }
 

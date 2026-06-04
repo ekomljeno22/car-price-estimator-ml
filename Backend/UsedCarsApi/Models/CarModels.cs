@@ -1,7 +1,5 @@
 namespace UsedCarsApi.Models;
 
-// ── Prediction ────────────────────────────────────────────────────────────────
-
 public record PredictRequest(
     int    ModelYear,
     double Milage,
@@ -18,8 +16,6 @@ public record PredictResponse(
     string PredictedPriceFormatted
 );
 
-// ── Options (dropdowns) ───────────────────────────────────────────────────────
-
 public record CarOptions(
     IReadOnlyList<string> FuelTypes,
     IReadOnlyList<string> Transmissions,
@@ -29,8 +25,13 @@ public record CarOptions(
     IReadOnlyList<string> Models
 );
 
-// ── ML service response shapes (for deserialization) ─────────────────────────
+// NOVO: odgovor za modele unutar branda
+public record BrandModelsResponse(
+    string               Brand,
+    IReadOnlyList<string> Models
+);
 
+// ML service response shapes
 internal record MlPredictResponse(
     double predicted_price,
     string predicted_price_formatted
@@ -42,5 +43,10 @@ internal record MlOptionsResponse(
     IReadOnlyList<string> accidents,
     IReadOnlyList<string> clean_titles,
     IReadOnlyList<string> brands,
+    IReadOnlyList<string> models
+);
+
+internal record MlBrandModelsResponse(
+    string               brand,
     IReadOnlyList<string> models
 );

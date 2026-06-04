@@ -1,11 +1,6 @@
 """
-Run this ONCE after training to persist the target-encoding maps.
-Place this file next to your training scripts and run:
-
-    python export_te_maps.py
-
-It reads used_cars.csv, re-computes the TE maps on the training split,
-and saves  data/te_maps.pkl  used by the FastAPI service.
+export_te_maps.py – Pokreni JEDANPUT nakon treniranja.
+Sprema TE mape i brand→modeli mapiranje u data/te_maps.pkl.
 """
 
 import pandas as pd
@@ -18,9 +13,10 @@ os.makedirs("data", exist_ok=True)
 
 df = pd.read_csv("used_cars.csv")
 
-df["price"]  = pd.to_numeric(df["price"].str.replace("[$,]", "", regex=True), errors="coerce")
-df["milage"] = pd.to_numeric(df["milage"].str.replace(r"\s*mi\.", "", regex=True).str.replace(",", ""), errors="coerce")
+df["price"]  = pd.to_numeric(df["price"].str.replace(r"[$,]", "", regex=True), errors="coerce")
+df["milage"] = pd.to_numeric(df["milage"].str.replace(r"[^\d.]", "", regex=True), errors="coerce")
 df = df.dropna(subset=["price", "milage", "model_year"])
+df = df[df["price"] >= 2500].reset_index(drop=True)
 
 y = np.log1p(df["price"])
 X = df.copy()
@@ -35,7 +31,19 @@ for col in ["brand", "model"]:
     tmp["_target"] = y_train
     te_maps[col] = tmp.groupby(col)["_target"].mean()
 
+# ── NOVO: brand → lista modela iz cijelog dataseta ────────────────────────────
+brand_model_map: dict[str, list[str]] = (
+    df.groupby("brand")["model"]
+      .apply(lambda s: sorted(s.unique().tolist()))
+      .to_dict()
+)
+te_maps["brand_model_map"] = brand_model_map
+
 with open("data/te_maps.pkl", "wb") as f:
     pickle.dump(te_maps, f)
 
-print(f"Saved te_maps.pkl — brands: {len(te_maps['brand'])}, models: {len(te_maps['model'])}")
+total_models = sum(len(v) for v in brand_model_map.values())
+print(f"Saved te_maps.pkl")
+print(f"  Brands : {len(te_maps['brand'])}")
+print(f"  Models : {len(te_maps['model'])}")
+print(f"  Brand→model mapping: {len(brand_model_map)} brandova, {total_models} ukupno modela")

@@ -24,3 +24,9 @@ public record CarOptions(
     IReadOnlyList<string> Brands,
     IReadOnlyList<string> Models
 );
+
+// NOVO: odgovor za modele filtriranje po brandu
+public record BrandModelsResponse(
+    string                Brand,
+    IReadOnlyList<string> Models
+);
