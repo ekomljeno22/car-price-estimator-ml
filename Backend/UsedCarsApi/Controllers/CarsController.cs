@@ -28,7 +28,6 @@ public sealed class CarsController(ICarPredictionService svc) : ControllerBase
         return Ok(options);
     }
 
-    /// <summary>Vraća modele koji postoje za zadani brand.</summary>
     [HttpGet("models-for-brand/{brand}")]
     [ProducesResponseType<BrandModelsResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -45,6 +44,16 @@ public sealed class CarsController(ICarPredictionService svc) : ControllerBase
         {
             return NotFound($"Brand '{brand}' not found.");
         }
+    }
+
+    [HttpGet("stats")]
+    [ProducesResponseType<ModelStats>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status502BadGateway)]
+    public async Task<IActionResult> Stats(CancellationToken ct)
+    {
+        var stats = await svc.GetStatsAsync(ct);
+        if (stats is null) return StatusCode(502, "ML service returned an empty response.");
+        return Ok(stats);
     }
 
     [HttpGet("health")]

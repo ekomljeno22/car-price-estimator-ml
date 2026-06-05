@@ -1,8 +1,11 @@
 namespace UsedCarsApi.Models;
 
-public record PredictRequest(
-    int    ModelYear,
-    double Milage,
+public record PredictRequest
+(
+    int ModelYear,
+    float Milage,
+    float Hp,
+    float Liters,
     string FuelType,
     string Transmission,
     string Accident,
@@ -13,7 +16,8 @@ public record PredictRequest(
 
 public record PredictResponse(
     double PredictedPrice,
-    string PredictedPriceFormatted
+    string PredictedPriceFormatted,
+    string ModelUsed
 );
 
 public record CarOptions(
@@ -25,16 +29,27 @@ public record CarOptions(
     IReadOnlyList<string> Models
 );
 
-// NOVO: odgovor za modele unutar branda
 public record BrandModelsResponse(
     string               Brand,
     IReadOnlyList<string> Models
 );
 
-// ML service response shapes
+public record ModelStats(
+    string ModelType,
+    double? Mae,
+    double? Rmse,
+    double? R2,
+    double? Mape,
+    double? TrainMape,
+    double? TrainR2,
+    int?    TrainingSamples,
+    string? BestModel
+);
+
 internal record MlPredictResponse(
     double predicted_price,
-    string predicted_price_formatted
+    string predicted_price_formatted,
+    string model_used
 );
 
 internal record MlOptionsResponse(
@@ -49,4 +64,16 @@ internal record MlOptionsResponse(
 internal record MlBrandModelsResponse(
     string               brand,
     IReadOnlyList<string> models
+);
+
+internal record MlStatsResponse(
+    string model_type,
+    double? mae,
+    double? rmse,
+    double? r2,
+    double? mape,
+    double? train_mape,
+    double? train_r2,
+    int?    training_samples,
+    string? best_model
 );

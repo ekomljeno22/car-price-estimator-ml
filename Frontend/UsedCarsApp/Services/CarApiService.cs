@@ -10,6 +10,7 @@ public interface ICarApiService
     Task<PredictResponse?>      PredictAsync(PredictRequest request, CancellationToken ct = default);
     Task<CarOptions?>           GetOptionsAsync(CancellationToken ct = default);
     Task<IReadOnlyList<string>> GetModelsForBrandAsync(string brand, CancellationToken ct = default);
+    Task<ModelStats?>           GetStatsAsync(CancellationToken ct = default);
 }
 
 public sealed class CarApiService : ICarApiService
@@ -45,4 +46,7 @@ public sealed class CarApiService : ICarApiService
                            $"/api/cars/models-for-brand/{encoded}", _opts, ct);
         return response?.Models ?? [];
     }
+
+    public async Task<ModelStats?> GetStatsAsync(CancellationToken ct = default)
+        => await _http.GetFromJsonAsync<ModelStats>("/api/cars/stats", _opts, ct);
 }

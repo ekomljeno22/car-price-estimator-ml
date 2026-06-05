@@ -10,7 +10,8 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        // Wire the DataContext to the real ViewModel with the API service
         DataContext = new MainViewModel(new CarApiService("http://localhost:5000"));
+
+        Opened += (_, _) => Opacity = 1;
     }
 }

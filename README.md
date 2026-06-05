@@ -44,7 +44,7 @@ python train.py            # kreira models/best_model.pkl
 ### 2. Izvezi Target Encoding mape
 
 ```bash
-cd MLService
+cd Intelligence
 python export_te_maps.py
 # → kreira data/te_maps.pkl
 ```
@@ -54,7 +54,7 @@ Ovo je potrebno samo jedanput (ili ako ponovo trenirate model).
 ### 3. Instaliraj Python pakete
 
 ```bash
-cd MLService
+cd Intelligence
 pip install -r requirements.txt
 ```
 
@@ -65,7 +65,7 @@ pip install -r requirements.txt
 ### Terminal 1 – Python ML Service
 
 ```bash
-cd MLService
+cd Intelligence
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
@@ -100,7 +100,7 @@ Otvara se desktop prozor aplikacije.
 
 ```
 UsedCarsPricePrediction/
-├── MLService/
+├── Intelligence/
 │   ├── main.py              ← FastAPI wrapper oko sklearn modela
 │   ├── export_te_maps.py    ← Jedanput pokreni za TE mape
 │   └── requirements.txt
@@ -147,7 +147,7 @@ UsedCarsPricePrediction/
 
 Ako trebaš promijeniti portove:
 
-- **ML Service port**: promijeni u `uvicorn main:app --port XXXX` i u `Backend/appsettings.json` → `MlService:BaseUrl`
+- **ML Service port**: promijeni u `uvicorn main:app --port XXXX` i u `Backend/appsettings.json` → `Intelligence:BaseUrl`
 - **Backend port**: promijeni u `appsettings.json` → `Urls`
 - **Frontend target**: promijeni u `Frontend/UsedCarsApp/Views/MainWindow.axaml.cs` → `new CarApiService("http://localhost:XXXX")`
 

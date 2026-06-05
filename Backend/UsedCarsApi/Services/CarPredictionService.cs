@@ -9,6 +9,7 @@ public interface ICarPredictionService
     Task<PredictResponse?>      PredictAsync(PredictRequest request, CancellationToken ct = default);
     Task<CarOptions?>           GetOptionsAsync(CancellationToken ct = default);
     Task<BrandModelsResponse?>  GetModelsForBrandAsync(string brand, CancellationToken ct = default);
+    Task<ModelStats?>           GetStatsAsync(CancellationToken ct = default);
 }
 
 public sealed class CarPredictionService(HttpClient http) : ICarPredictionService
@@ -36,7 +37,11 @@ public sealed class CarPredictionService(HttpClient http) : ICarPredictionServic
         response.EnsureSuccessStatusCode();
 
         var ml = await response.Content.ReadFromJsonAsync<MlPredictResponse>(_opts, ct);
-        return ml is null ? null : new PredictResponse(ml.predicted_price, ml.predicted_price_formatted);
+        return ml is null ? null : new PredictResponse(
+            ml.predicted_price,
+            ml.predicted_price_formatted,
+            ml.model_used
+        );
     }
 
     public async Task<CarOptions?> GetOptionsAsync(CancellationToken ct = default)
@@ -60,5 +65,23 @@ public sealed class CarPredictionService(HttpClient http) : ICarPredictionServic
         var ml       = await http.GetFromJsonAsync<MlBrandModelsResponse>(
                            $"/models-for-brand/{encoded}", _opts, ct);
         return ml is null ? null : new BrandModelsResponse(ml.brand, ml.models);
+    }
+
+    public async Task<ModelStats?> GetStatsAsync(CancellationToken ct = default)
+    {
+        var ml = await http.GetFromJsonAsync<MlStatsResponse>("/stats", _opts, ct);
+        return ml is null
+            ? null
+            : new ModelStats(
+                ml.model_type,
+                ml.mae,
+                ml.rmse,
+                ml.r2,
+                ml.mape,
+                ml.train_mape,
+                ml.train_r2,
+                ml.training_samples,
+                ml.best_model
+            );
     }
 }

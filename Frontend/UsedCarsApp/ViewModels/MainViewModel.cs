@@ -10,19 +10,16 @@ public partial class MainViewModel : ObservableObject
 {
     private readonly ICarApiService _api;
 
-    // ── Dropdown kolekcije ────────────────────────────────────────────────────
     public ObservableCollection<string> FuelTypes     { get; } = [];
     public ObservableCollection<string> Transmissions { get; } = [];
     public ObservableCollection<string> Accidents     { get; } = [];
     public ObservableCollection<string> CleanTitles   { get; } = [];
     public ObservableCollection<string> Brands        { get; } = [];
+    public ObservableCollection<string> CarModels     { get; } = [];
+    public ObservableCollection<StatCard> StatsCards { get; } = [];
 
-    // CarModels je ODVOJEN od ostalih – puni se dinamički po odabranom brandu
-    public ObservableCollection<string> CarModels { get; } = [];
-
-    // ── Input fields ──────────────────────────────────────────────────────────
-    [ObservableProperty] private int    _modelYear    = DateTime.Now.Year - 3;
-    [ObservableProperty] private double _milage       = 50_000;
+    [ObservableProperty] private int    _modelYear        = DateTime.Now.Year - 3;
+    [ObservableProperty] private double _milage           = 50_000;
     [ObservableProperty] private string _selectedFuelType     = "gas";
     [ObservableProperty] private string _selectedTransmission = "automatic";
     [ObservableProperty] private string _selectedAccident     = "None";
@@ -30,25 +27,30 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _selectedBrand        = string.Empty;
     [ObservableProperty] private string _selectedCarModel     = string.Empty;
 
-    // ── Output / status ───────────────────────────────────────────────────────
+    [ObservableProperty] private double _hp = 200;
+[ObservableProperty] private double _liters = 2.0;
+
     [ObservableProperty] private string _predictedPrice = "—";
+    [ObservableProperty] private string _modelUsed      = "—";
+    [ObservableProperty] private string _statsModelType = "—";
     [ObservableProperty] private string _statusMessage  = "Učitavanje opcija…";
     [ObservableProperty] private bool   _isBusy;
     [ObservableProperty] private bool   _hasError;
     [ObservableProperty] private bool   _isLoadingModels;
+    
+    [ObservableProperty] private bool   _showResultPopup;
 
     public MainViewModel(ICarApiService api)
     {
         _api = api;
         _ = LoadOptionsAsync();
+        _ = LoadStatsAsync();
     }
 
-    // ── Kad se brand promijeni → učitaj filtrirane modele ────────────────────
     partial void OnSelectedBrandChanged(string value)
     {
         PredictCommand.NotifyCanExecuteChanged();
 
-        // Prazni modele odmah da korisnik ne može slučajno odabrati krivi model
         CarModels.Clear();
         SelectedCarModel = string.Empty;
 
@@ -62,7 +64,11 @@ public partial class MainViewModel : ObservableObject
     partial void OnIsBusyChanged(bool value) =>
         PredictCommand.NotifyCanExecuteChanged();
 
-    // ── Commands ──────────────────────────────────────────────────────────────
+    [RelayCommand]
+    private void ClosePopup()
+    {
+        ShowResultPopup = false;
+    }
 
     [RelayCommand(CanExecute = nameof(CanPredict))]
     private async Task PredictAsync()
@@ -72,7 +78,7 @@ public partial class MainViewModel : ObservableObject
         StatusMessage = "Predviđam cijenu…";
 
         try
-        {
+         {
             var request = new PredictRequest(
                 ModelYear:    ModelYear,
                 Milage:       Milage,
@@ -81,14 +87,19 @@ public partial class MainViewModel : ObservableObject
                 Accident:     SelectedAccident,
                 CleanTitle:   SelectedCleanTitle,
                 Brand:        SelectedBrand,
-                Model:        SelectedCarModel
+                Model:        SelectedCarModel,
+                Hp:           (float)Hp,
+                Liters:       (float)Liters
             );
 
             var result = await _api.PredictAsync(request);
             if (result is not null)
             {
                 PredictedPrice = result.PredictedPriceFormatted;
+                ModelUsed       = string.IsNullOrWhiteSpace(result.ModelUsed) ? "—" : result.ModelUsed;
                 StatusMessage  = "Predviđanje završeno.";
+                
+                ShowResultPopup = true;
             }
             else
             {
@@ -113,7 +124,6 @@ public partial class MainViewModel : ObservableObject
         !string.IsNullOrEmpty(SelectedBrand) &&
         !string.IsNullOrEmpty(SelectedCarModel);
 
-    // ── Učitaj inicijalne opcije (brandovi, fuel, transmission…) ─────────────
     private async Task LoadOptionsAsync()
     {
         try
@@ -132,8 +142,6 @@ public partial class MainViewModel : ObservableObject
             SelectedAccident     = Accidents.FirstOrDefault("None");
             SelectedCleanTitle   = CleanTitles.FirstOrDefault("Yes");
 
-            // Postavljanje prvog branda triggerat će OnSelectedBrandChanged
-            // koji će automatski učitati modele za taj brand
             if (Brands.Count > 0)
                 SelectedBrand = Brands[0];
 
@@ -146,7 +154,6 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    // ── Učitaj modele za odabrani brand ───────────────────────────────────────
     private async Task LoadModelsForBrandAsync(string brand)
     {
         IsLoadingModels = true;
@@ -160,7 +167,6 @@ public partial class MainViewModel : ObservableObject
             foreach (var m in models)
                 CarModels.Add(m);
 
-            // Automatski odaberi prvi model
             SelectedCarModel = CarModels.Count > 0 ? CarModels[0] : string.Empty;
 
             StatusMessage = CarModels.Count > 0
@@ -184,4 +190,44 @@ public partial class MainViewModel : ObservableObject
         target.Clear();
         foreach (var item in source) target.Add(item);
     }
+
+    private async Task LoadStatsAsync()
+    {
+        try
+        {
+            var stats = await _api.GetStatsAsync();
+            if (stats is null) return;
+
+            StatsCards.Clear();
+            StatsCards.Add(new StatCard("MAPE", FormatPercent(stats.Mape), ToneFromMape(stats.Mape)));
+            StatsCards.Add(new StatCard("R²",   FormatNumber(stats.R2, 4), "#38BDF8"));
+            StatsCards.Add(new StatCard("MAE",  FormatCurrency(stats.Mae), "#F97316"));
+            StatsCards.Add(new StatCard("RMSE", FormatCurrency(stats.Rmse), "#F59E0B"));
+            StatsCards.Add(new StatCard("Train MAPE", FormatPercent(stats.TrainMape), "#22C55E"));
+            StatsCards.Add(new StatCard("Uzorci", FormatCount(stats.TrainingSamples), "#A7F3D0"));
+
+            StatsModelType = string.IsNullOrWhiteSpace(stats.BestModel)
+                ? stats.ModelType
+                : $"{stats.BestModel} (best)";
+        }
+        catch
+        {
+            // Statistika je opcionalna
+        }
+    }
+
+    private static string FormatPercent(double? value) => value is null ? "—" : $"{value:0.00}%";
+    private static string FormatNumber(double? value, int decimals) => value is null ? "—" : value.Value.ToString($"0.{new string('0', decimals)}");
+    private static string FormatCurrency(double? value) => value is null ? "—" : $"${value:0,0}";
+    private static string FormatCount(int? value) => value is null ? "—" : value.Value.ToString("0,0");
+
+    private static string ToneFromMape(double? mape)
+    {
+        if (mape is null) return "#94A3B8";
+        if (mape <= 10) return "#22C55E";
+        if (mape <= 15) return "#F59E0B";
+        return "#EF4444";
+    }
 }
+
+public sealed record StatCard(string Label, string Value, string Accent);

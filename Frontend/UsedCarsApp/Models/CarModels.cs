@@ -1,8 +1,11 @@
 namespace UsedCarsApp.Models;
 
-public record PredictRequest(
-    int    ModelYear,
+public record PredictRequest
+(
+    int ModelYear,
     double Milage,
+    float Hp,
+    float Liters,
     string FuelType,
     string Transmission,
     string Accident,
@@ -13,7 +16,8 @@ public record PredictRequest(
 
 public record PredictResponse(
     double PredictedPrice,
-    string PredictedPriceFormatted
+    string PredictedPriceFormatted,
+    string ModelUsed
 );
 
 public record CarOptions(
@@ -25,8 +29,19 @@ public record CarOptions(
     IReadOnlyList<string> Models
 );
 
-// NOVO: odgovor za modele filtriranje po brandu
 public record BrandModelsResponse(
     string                Brand,
     IReadOnlyList<string> Models
+);
+
+public record ModelStats(
+    string ModelType,
+    double? Mae,
+    double? Rmse,
+    double? R2,
+    double? Mape,
+    double? TrainMape,
+    double? TrainR2,
+    int?    TrainingSamples,
+    string? BestModel
 );
