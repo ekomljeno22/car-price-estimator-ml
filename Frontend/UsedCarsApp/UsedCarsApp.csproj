@@ -10,17 +10,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Avalonia -->
     <PackageReference Include="Avalonia"                         Version="11.1.0" />
     <PackageReference Include="Avalonia.Desktop"                 Version="11.1.0" />
     <PackageReference Include="Avalonia.Themes.Fluent"           Version="11.1.0" />
     <PackageReference Include="Avalonia.Fonts.Inter"             Version="11.1.0" />
     <PackageReference Include="Avalonia.ReactiveUI"              Version="11.1.0" />
 
-    <!-- MVVM toolkit -->
     <PackageReference Include="CommunityToolkit.Mvvm"            Version="8.3.2" />
 
-    <!-- HTTP + JSON -->
     <PackageReference Include="System.Net.Http.Json"             Version="8.0.0" />
   </ItemGroup>
 

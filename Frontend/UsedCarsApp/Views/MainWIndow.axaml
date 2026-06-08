@@ -39,22 +39,22 @@
         </Style>
 
         <Style Selector="Button.primary">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
-                        <GradientStop Color="#F97316" Offset="0" />
-                        <GradientStop Color="#0EA5E9" Offset="1" />
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="Height" Value="54" />
-            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="Background" Value="#F97316" /> <Setter Property="Foreground" Value="White" />
+            <Setter Property="Height" Value="48" />
+            <Setter Property="CornerRadius" Value="10" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Padding" Value="24 0" /> 
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
+
         <Style Selector="Button.primary:pointerover">
-            <Setter Property="Opacity" Value="0.92" />
+            <Setter Property="Background" Value="#FB923C" />
+        </Style>
+
+        <Style Selector="Button.primary:pressed">
+            <Setter Property="Background" Value="#EA580C" />
         </Style>
 
         <Style Selector="ComboBox">
@@ -71,6 +71,14 @@
         <Style Selector="ComboBox:pointerover">
             <Setter Property="BorderBrush" Value="#F97316" />
         </Style>
+        <Style Selector="ComboBoxItem:selected">
+            <Setter Property="Background" Value="#F97316" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="ComboBox /template/ Border#PopupBorder">
+            <Setter Property="Background" Value="#0F172A" />
+            <Setter Property="BorderBrush" Value="#1F2A3A" />
+        </Style>
 
         <Style Selector="NumericUpDown">
             <Setter Property="Background" Value="#0B1220" />
@@ -79,6 +87,7 @@
             <Setter Property="Foreground" Value="#E5E7EB" />
             <Setter Property="Height" Value="44" />
             <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
         <Style Selector="NumericUpDown:pointerover">
             <Setter Property="BorderBrush" Value="#0EA5E9" />
@@ -208,7 +217,7 @@
                 <StackPanel Spacing="24">
                     <StackPanel Spacing="6">
                         <TextBlock Text="Unesi podatke o vozilu" FontSize="30" FontWeight="Bold" Foreground="#F8FAFC" />
-                        <TextBlock Text="Odaberi marku i model iz padajućih izbornika za preciznu procjenu tržišne cijene." FontSize="14" Foreground="#94A3B8" />
+                        <TextBlock Text="Odaberi marku i model iz padajućih izbornika za preciznu procjenu tržišne cijene" FontSize="14" Foreground="#94A3B8" />
                     </StackPanel>
 
                     <Border Classes="card" Padding="24">
@@ -238,13 +247,13 @@
                                 <NumericUpDown Grid.Row="1" Grid.Column="2" Value="{Binding Milage}" Minimum="0" Maximum="999999" FormatString="0" Increment="5000" />
                             </Grid>
 
-                            <Grid ColumnDefinitions="*,20,*" RowDefinitions="Auto,Auto,Auto" Margin="0 4 0 0">
+                            <Grid ColumnDefinitions="*,20,*" RowDefinitions="Auto,Auto" Margin="0 4 0 0">
 
                                 <TextBlock Grid.Row="0" Grid.Column="0" Classes="label" Text="SNAGA (HP)" />
                                 <TextBlock Grid.Row="0" Grid.Column="2" Classes="label" Text="LITRAŽA MOTORA" />
 
-                                <NumericUpDown Grid.Row="3" Grid.Column="0" Value="{Binding Hp}" Minimum="50" Maximum="1000" FormatString="0" />
-                                <NumericUpDown Grid.Row="3" Grid.Column="2" Value="{Binding Liters}" Minimum="0.5" Maximum="8.0" FormatString="0.0" Increment="0.1" />
+                                <NumericUpDown Grid.Row="1" Grid.Column="0" Value="{Binding Hp}" Minimum="50" Maximum="1000" FormatString="0" />
+                                <NumericUpDown Grid.Row="1" Grid.Column="2" Value="{Binding Liters}" Minimum="0.5" Maximum="8.0" FormatString="0.0" Increment="0.1" />
                             </Grid>
                         </StackPanel>
                     </Border>
