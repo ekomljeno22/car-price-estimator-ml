@@ -41,17 +41,10 @@ python preprocessing.py    # kreira data/
 python train.py            # kreira models/best_model.pkl
 ```
 
-### 2. Izvezi Target Encoding mape
-
-```bash
-cd Intelligence
-python export_te_maps.py
-# → kreira data/te_maps.pkl
-```
 
 Ovo je potrebno samo jedanput (ili ako ponovo trenirate model).
 
-### 3. Instaliraj Python pakete
+### 2. Instaliraj Python pakete
 
 ```bash
 cd Intelligence

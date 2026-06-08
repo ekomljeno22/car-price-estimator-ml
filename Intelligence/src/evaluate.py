@@ -49,10 +49,10 @@ def run_evaluation():
     print("=" * 65)
     print(f"MODEL PERFORMANCE REPORT: {model_name}")
     print("=" * 65)
-    print(f"MAE : ${mae:>12,.2f}")
+    print(f"MAE  : ${mae:>12,.2f}")
     print(f"RMSE : ${rmse:>12,.2f}")
-    print(f"R² :  {r2:>10.4f}")
-    print(f"MAPE : {mape:>10.2f}% {'✓ PASS (≤10%)' if mape <= 10 else '✗ FAIL (>10%)'}")
+    print(f"R²   :  {r2:>10.4f}")
+    print(f"MAPE : {mape:>10.2f}%  {'✓ PASS (≤10%)' if mape <= 10 else '✗ FAIL (>10%)'}")
     print("=" * 65)
 
     print("\nMAPE po cjenovnim segmentima:")
@@ -64,10 +64,10 @@ def run_evaluation():
         print(f"  {lbl:<12}: {seg:6.2f}%  (n={m.sum()})")
 
     metrics = dict(model=model_name, mae=round(float(mae), 2), rmse=round(float(rmse), 2),
-                   r2=round(float(r2), 4), mape=round(float(mape), 4))
+                    r2=round(float(r2), 4), mape=round(float(mape), 4))
     with open('results/metrics.json', 'w') as f:
         json.dump(metrics, f, indent=2)
-    print("\nSaved: results/metrics.json")
+    print("\nSpremljeno: results/metrics.json")
 
     cap  = np.percentile(y_true, 99)
     mask = (y_true <= cap) & (y_pred <= cap)
@@ -82,8 +82,15 @@ def run_evaluation():
     fmt = plt.FuncFormatter(lambda x, _: f'${x:,.0f}')
     ax.xaxis.set_major_formatter(fmt); ax.yaxis.set_major_formatter(fmt)
     ax.legend(); ax.grid(True, linestyle=':', alpha=0.5)
-    plt.tight_layout(); plt.savefig('results/prediction_vs_actual.png', dpi=200); plt.close()
-    print("Saved: results/prediction_vs_actual.png")
+    
+    ax.text(0.03, 0.95, f"MAPE = {mape:.2f}%\nR² = {r2:.4f}",
+            transform=ax.transAxes, fontsize=11, va='top',
+            bbox=dict(boxstyle='round,pad=0.4', facecolor='white', alpha=0.8))
+            
+    plt.tight_layout()
+    plt.savefig('results/prediction_vs_actual.png', dpi=200)
+    plt.close()
+    print("Spremljeno: results/prediction_vs_actual.png")
 
     pct_errors = np.abs((y_true - y_pred) / y_true.clip(min=1)) * 100
     pct_errors = pct_errors[np.isfinite(pct_errors)]
@@ -96,8 +103,11 @@ def run_evaluation():
     ax.set_xlabel('Absolute Percentage Error (%)'); ax.set_ylabel('Count')
     ax.set_title(f'Error Distribution  ({within_10:.1f}% predictions within ±10%)')
     ax.legend(); ax.grid(True, linestyle=':', alpha=0.4, axis='y')
-    plt.tight_layout(); plt.savefig('results/error_distribution.png', dpi=200); plt.close()
-    print("Saved: results/error_distribution.png")
+    
+    plt.tight_layout()
+    plt.savefig('results/error_distribution.png', dpi=200)
+    plt.close()
+    print("Spremljeno: results/error_distribution.png")
 
     residuals = y_true - y_pred
     print(f"\nRezidual analiza:")
@@ -105,3 +115,40 @@ def run_evaluation():
     print(f"  Std     : ${np.std(residuals):>12,.2f}")
     print(f"  Within ±10% : {within_10:.1f}%")
     print(f"  Within  ±5% : {(pct_errors <= 5).mean() * 100:.1f}%")
+
+    history_path = '../car-price-estimator-ml/logs/training_history.json'
+    print(f"\nProvjeravam povijest treniranja na: {os.path.abspath(history_path)}")
+
+    if os.path.exists(history_path):
+        print("Datoteka 'training_history.json' uspješno pronađena. Učitavam...")
+        with open(history_path) as f:
+            history = json.load(f)
+
+        loss_curve = history.get('loss_curve', [])
+        print(f"📊 Učitano stavki iz 'loss_curve': {len(loss_curve)}")
+        
+        if len(loss_curve) > 0:
+            fig_lc, ax_lc = plt.subplots(figsize=(7, 5))
+            epochs = np.arange(1, len(loss_curve) + 1)
+
+            if len(loss_curve) > 10:
+                smooth = np.convolve(loss_curve, np.ones(5)/5, mode='same')
+                ax_lc.plot(epochs, loss_curve, color='lightblue', lw=0.8, alpha=0.6, label='Raw loss')
+                ax_lc.plot(epochs, smooth,     color='royalblue', lw=2,   label='Smoothed (w=5)')
+            else:
+                ax_lc.plot(epochs, loss_curve, color='royalblue', lw=2, marker='o', label='Train loss')
+
+            ax_lc.set_xlabel('Epoch')
+            ax_lc.set_ylabel('MSE Loss')
+            ax_lc.set_title('Training Loss Curve')
+            ax_lc.legend()
+            ax_lc.grid(True, linestyle=':', alpha=0.5)
+            
+            plt.tight_layout()
+            plt.savefig('results/learning_curves.png', dpi=200)
+            plt.close()
+            print("Spremljeno: results/learning_curves.png")
+        else:
+            print("'loss_curve' je prazna unutar datoteke.")
+    else:
+        print(f"Greška: Datoteka ne postoji na putanji. Trenutna radna mapa skripte je: {os.getcwd()}")
