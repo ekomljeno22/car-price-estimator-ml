@@ -7,20 +7,20 @@
         Title="AutoVal · Used Car Price Estimator"
         WindowState="Maximized"
         WindowStartupLocation="CenterScreen"
-        Background="#060B12">
+        Background="{DynamicResource AppBackgroundBrush}">
 
     <Window.Styles>
 
         <!-- ── Base text ── -->
         <Style Selector="TextBlock">
             <Setter Property="FontFamily" Value="'Space Grotesk', 'Plus Jakarta Sans', 'Segoe UI', sans-serif" />
-            <Setter Property="Foreground" Value="#F1F5F9" />
+            <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}" />
         </Style>
 
         <Style Selector="TextBlock.label">
             <Setter Property="FontSize" Value="10" />
             <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Foreground" Value="#94A3B8" />
+            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
             <Setter Property="Margin" Value="0 0 0 6" />
             <Setter Property="LetterSpacing" Value="2" />
         </Style>
@@ -28,28 +28,28 @@
         <Style Selector="TextBlock.section-title">
             <Setter Property="FontSize" Value="11" />
             <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Foreground" Value="#CBD5E1" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSoftBrush}" />
             <Setter Property="LetterSpacing" Value="1.5" />
         </Style>
 
         <!-- ── Cards ── -->
         <Style Selector="Border.card">
-            <Setter Property="Background" Value="#0D1829" />
+            <Setter Property="Background" Value="{DynamicResource CardBrush}" />
             <Setter Property="CornerRadius" Value="14" />
-            <Setter Property="BorderBrush" Value="#1E3048" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderSoftBrush}" />
             <Setter Property="BorderThickness" Value="1" />
         </Style>
 
         <Style Selector="Border.card-inner">
-            <Setter Property="Background" Value="#0A1520" />
+            <Setter Property="Background" Value="{DynamicResource CardInnerBrush}" />
             <Setter Property="CornerRadius" Value="10" />
-            <Setter Property="BorderBrush" Value="#1A2D44" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderSoftBrush}" />
             <Setter Property="BorderThickness" Value="1" />
         </Style>
 
         <!-- ── Primary button ── -->
         <Style Selector="Button.primary">
-            <Setter Property="Background" Value="#F97316" />
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
             <Setter Property="Foreground" Value="White" />
             <Setter Property="Height" Value="52" />
             <Setter Property="CornerRadius" Value="12" />
@@ -61,22 +61,22 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
         <Style Selector="Button.primary:pointerover">
-            <Setter Property="Background" Value="#FB923C" />
+            <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}" />
         </Style>
         <Style Selector="Button.primary:pressed">
-            <Setter Property="Background" Value="#C2530A" />
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
         </Style>
         <Style Selector="Button.primary:disabled">
-            <Setter Property="Background" Value="#2A3545" />
-            <Setter Property="Foreground" Value="#4A5568" />
+            <Setter Property="Background" Value="{DynamicResource CardInnerBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
         </Style>
 
         <!-- ── Comboboxes ── -->
         <Style Selector="ComboBox">
-            <Setter Property="Background" Value="#0A1520" />
-            <Setter Property="BorderBrush" Value="#1E3048" />
+            <Setter Property="Background" Value="{DynamicResource CardInnerBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderSoftBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Foreground" Value="#F1F5F9" />
+            <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}" />
             <Setter Property="Height" Value="46" />
             <Setter Property="CornerRadius" Value="10" />
             <Setter Property="Padding" Value="14 0" />
@@ -84,29 +84,29 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
         <Style Selector="ComboBox:pointerover">
-            <Setter Property="BorderBrush" Value="#F97316" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
         </Style>
         <Style Selector="ComboBoxItem:selected">
-            <Setter Property="Background" Value="#F97316" />
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
             <Setter Property="Foreground" Value="White" />
         </Style>
         <Style Selector="ComboBox /template/ Border#PopupBorder">
-            <Setter Property="Background" Value="#0D1829" />
-            <Setter Property="BorderBrush" Value="#1E3048" />
+            <Setter Property="Background" Value="{DynamicResource CardBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderSoftBrush}" />
         </Style>
 
         <!-- ── NumericUpDown ── -->
         <Style Selector="NumericUpDown">
-            <Setter Property="Background" Value="#0A1520" />
-            <Setter Property="BorderBrush" Value="#1E3048" />
+            <Setter Property="Background" Value="{DynamicResource CardInnerBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderSoftBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Foreground" Value="#F1F5F9" />
+            <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}" />
             <Setter Property="Height" Value="46" />
             <Setter Property="CornerRadius" Value="10" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
         <Style Selector="NumericUpDown:pointerover">
-            <Setter Property="BorderBrush" Value="#38BDF8" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InfoBrush}" />
         </Style>
 
         <!-- ── Tab styles ── -->
@@ -116,7 +116,7 @@
         </Style>
         <Style Selector="TabItem">
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="#64748B" />
+            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="FontSize" Value="13" />
             <Setter Property="Padding" Value="18 12" />
@@ -125,11 +125,11 @@
             <Setter Property="BorderBrush" Value="Transparent" />
         </Style>
         <Style Selector="TabItem:selected">
-            <Setter Property="Foreground" Value="#F97316" />
-            <Setter Property="BorderBrush" Value="#F97316" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
         </Style>
         <Style Selector="TabItem:pointerover">
-            <Setter Property="Foreground" Value="#CBD5E1" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSoftBrush}" />
         </Style>
     </Window.Styles>
 
@@ -195,51 +195,51 @@
                             </StackPanel>
                         </StackPanel>
 
-                        <Rectangle Height="1" Fill="#1E3048" />
+                        <Rectangle Height="1" Fill="{DynamicResource BorderSoftBrush}" />
 
                         <StackPanel Spacing="10">
                             <TextBlock Classes="label" Text="TRENUTNI ODABIR" />
                             <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
                                 <Border Classes="card-inner" Grid.Row="0" Grid.Column="0" Padding="12 10" Margin="0 0 5 5">
                                     <StackPanel Spacing="3">
-                                        <TextBlock Text="MARKA" FontSize="9" Foreground="#475569" LetterSpacing="1.5" />
+                                        <TextBlock Text="MARKA" FontSize="9" Foreground="{DynamicResource TextMutedBrush}" LetterSpacing="1.5" />
                                         <TextBlock Text="{Binding SelectedBrand, FallbackValue='—'}"
-                                                   FontSize="13" FontWeight="Bold" Foreground="#E2E8F0"
+                                                   FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"
                                                    TextTrimming="CharacterEllipsis" />
                                     </StackPanel>
                                 </Border>
                                 <Border Classes="card-inner" Grid.Row="0" Grid.Column="1" Padding="12 10" Margin="5 0 0 5">
                                     <StackPanel Spacing="3">
-                                        <TextBlock Text="MODEL" FontSize="9" Foreground="#475569" LetterSpacing="1.5" />
+                                        <TextBlock Text="MODEL" FontSize="9" Foreground="{DynamicResource TextMutedBrush}" LetterSpacing="1.5" />
                                         <TextBlock Text="{Binding SelectedCarModel, FallbackValue='—'}"
-                                                   FontSize="13" FontWeight="Bold" Foreground="#E2E8F0"
+                                                   FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"
                                                    TextTrimming="CharacterEllipsis" />
                                     </StackPanel>
                                 </Border>
                                 <Border Classes="card-inner" Grid.Row="1" Grid.Column="0" Padding="12 10" Margin="0 0 5 0">
                                     <StackPanel Spacing="3">
-                                        <TextBlock Text="GODINA" FontSize="9" Foreground="#475569" LetterSpacing="1.5" />
+                                        <TextBlock Text="GODINA" FontSize="9" Foreground="{DynamicResource TextMutedBrush}" LetterSpacing="1.5" />
                                         <TextBlock Text="{Binding ModelYear}"
-                                                   FontSize="13" FontWeight="Bold" Foreground="#E2E8F0" />
+                                                   FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
                                     </StackPanel>
                                 </Border>
                                 <Border Classes="card-inner" Grid.Row="1" Grid.Column="1" Padding="12 10" Margin="5 0 0 0">
                                     <StackPanel Spacing="3">
-                                        <TextBlock Text="MILJE" FontSize="9" Foreground="#475569" LetterSpacing="1.5" />
+                                        <TextBlock Text="MILJE" FontSize="9" Foreground="{DynamicResource TextMutedBrush}" LetterSpacing="1.5" />
                                         <TextBlock Text="{Binding Milage, StringFormat='{}{0:N0}'}"
-                                                   FontSize="13" FontWeight="Bold" Foreground="#E2E8F0" />
+                                                   FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
                                     </StackPanel>
                                 </Border>
                             </Grid>
                         </StackPanel>
 
-                        <Rectangle Height="1" Fill="#1E3048" />
+                        <Rectangle Height="1" Fill="{DynamicResource BorderSoftBrush}" />
 
                         <!-- Stats cards -->
                         <StackPanel Spacing="10">
                             <TextBlock Classes="label" Text="STATISTIKA MODELA" />
                             <TextBlock Text="{Binding StatsModelType}"
-                                       FontSize="12" Foreground="#93C5FD" Margin="0 0 0 4" />
+                                       FontSize="12" Foreground="{DynamicResource InfoBrush}" Margin="0 0 0 4" />
                             <ItemsControl ItemsSource="{Binding StatsCards}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -251,7 +251,7 @@
                                         <Border Classes="card-inner" Padding="10" Margin="0 0 5 5">
                                             <StackPanel Spacing="3">
                                                 <TextBlock Text="{Binding Label}"
-                                                           FontSize="9" Foreground="#475569" LetterSpacing="1.2" />
+                                                           FontSize="9" Foreground="{DynamicResource TextMutedBrush}" LetterSpacing="1.2" />
                                                 <TextBlock Text="{Binding Value}"
                                                            FontSize="14" FontWeight="Bold"
                                                            Foreground="{Binding Accent}" />
@@ -262,20 +262,20 @@
                             </ItemsControl>
                         </StackPanel>
 
-                        <Rectangle Height="1" Fill="#1E3048" />
+                        <Rectangle Height="1" Fill="{DynamicResource BorderSoftBrush}" />
 
                         <!-- Status box -->
-                        <Border Background="#0A1520" CornerRadius="12" Padding="14 12"
-                                BorderBrush="#1E3048" BorderThickness="1">
+                        <Border Background="{DynamicResource CardInnerBrush}" CornerRadius="12" Padding="14 12"
+                                BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="1">
                             <StackPanel Spacing="8">
                                 <StackPanel Orientation="Horizontal" Spacing="8"
                                             IsVisible="{Binding IsLoadingModels}">
                                     <Ellipse Width="7" Height="7" Fill="#F59E0B" />
                                     <TextBlock Text="Komunikacija s ML servisom..."
-                                               FontSize="12" Foreground="#94A3B8" />
+                                               FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
                                 </StackPanel>
                                 <TextBlock Text="{Binding StatusMessage}"
-                                           FontSize="12" Foreground="#94A3B8" TextWrapping="Wrap" />
+                                           FontSize="12" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
                                 <Border IsVisible="{Binding HasError}"
                                         Background="#2A0B0B" CornerRadius="6" Padding="10 8">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
@@ -300,7 +300,6 @@
                          TAB 1 – PROCJENA
                          ══════════════════════ -->
                     <TabItem Header="🔧  Procjena cijene">
-                        <!-- This ScrollViewer fills Row=1 so the button is always reachable -->
                         <ScrollViewer VerticalScrollBarVisibility="Auto"
                                       HorizontalScrollBarVisibility="Disabled">
                             <StackPanel Spacing="22" Margin="0 4 0 20">
@@ -308,7 +307,7 @@
                                 <!-- Page heading -->
                                 <StackPanel Spacing="4">
                                     <TextBlock Text="Unesi podatke o vozilu"
-                                               FontSize="28" FontWeight="Bold" Foreground="#F8FAFC" />
+                                               FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
                                 </StackPanel>
 
                                 <!-- Card: identifikacija -->
@@ -398,7 +397,7 @@
                                     </StackPanel>
                                 </Border>
 
-                                <!-- CTA button – always at the bottom, never clipped -->
+                                <!-- CTA button -->
                                 <Button Classes="primary"
                                         Command="{Binding PredictCommand}"
                                         HorizontalAlignment="Stretch"
@@ -428,15 +427,18 @@
 
                                 <StackPanel Spacing="4">
                                     <TextBlock Text="Vizualna analiza modela"
-                                               FontSize="28" FontWeight="Bold" Foreground="#F8FAFC" />
+                                               FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
                                     <TextBlock Text="Grafovi se dohvaćaju s ML servisa. Klikni Osvježi da učitaš slike."
-                                               FontSize="14" Foreground="#64748B" />
+                                               FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="12">
                                     <Button Classes="primary" Command="{Binding LoadChartsCommand}"
-                                            HorizontalAlignment="Left" Padding="24 0">
-                                        <TextBlock Text="🔄  Osvježi grafove" FontSize="14" FontWeight="Bold" Foreground="White" />
+                                            HorizontalAlignment="Left" Padding="24 0"
+                                            HorizontalContentAlignment="Center"
+                                            VerticalContentAlignment="Center">
+                                        <TextBlock Text="🔄  Osvježi grafove" FontSize="14" FontWeight="Bold" Foreground="White"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     </Button>
                                     <Border Classes="card-inner" Padding="14 0" Height="52" VerticalAlignment="Center">
                                         <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
@@ -462,13 +464,15 @@
                                                     BorderThickness="0"
                                                     Padding="0"
                                                     Cursor="Hand"
-                                                    HorizontalAlignment="Stretch">
+                                                    HorizontalAlignment="Stretch"
+                                                    HorizontalContentAlignment="Stretch">
                                                 <Border Classes="card" Padding="16" Margin="0 0 12 12">
                                                     <StackPanel Spacing="10">
                                                         <Grid ColumnDefinitions="*,Auto">
                                                             <TextBlock Text="{Binding Label}"
                                                                        FontSize="12" FontWeight="Bold"
-                                                                       Foreground="{DynamicResource TextSoftBrush}" />
+                                                                       Foreground="{DynamicResource TextSoftBrush}"
+                                                                       VerticalAlignment="Center" />
                                                             <Border Grid.Column="1" Background="{DynamicResource CardInnerBrush}"
                                                                     BorderBrush="{DynamicResource BorderSoftBrush}"
                                                                     BorderThickness="1" CornerRadius="8" Padding="8 4">
@@ -484,7 +488,8 @@
                                                                 Padding="8">
                                                             <Image Source="{Binding ImageSource}"
                                                                    Stretch="Uniform"
-                                                                   MaxHeight="280" />
+                                                                   MaxHeight="280"
+                                                                   HorizontalAlignment="Center" />
                                                         </Border>
                                                     </StackPanel>
                                                 </Border>
@@ -499,9 +504,9 @@
                                         <TextBlock Text="📈" FontSize="48" HorizontalAlignment="Center" />
                                         <TextBlock Text="Grafovi još nisu učitani"
                                                    FontSize="16" FontWeight="SemiBold"
-                                                   Foreground="#94A3B8" HorizontalAlignment="Center" />
+                                                   Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" />
                                         <TextBlock Text="Klikni gumb Osvježi grafove iznad."
-                                                   FontSize="13" Foreground="#475569"
+                                                   FontSize="13" Foreground="{DynamicResource TextMutedBrush}"
                                                    HorizontalAlignment="Center" />
                                     </StackPanel>
                                 </Border>
@@ -520,20 +525,20 @@
 
                                 <StackPanel Spacing="4">
                                     <TextBlock Text="Performanse ML modela"
-                                               FontSize="28" FontWeight="Bold" Foreground="#F8FAFC" />
+                                               FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
                                     <TextBlock Text="Metrike evaluacije na test skupu."
-                                               FontSize="14" Foreground="#64748B" />
+                                               FontSize="14" Foreground="{DynamicResource TextMutedBrush}" />
                                 </StackPanel>
 
                                 <!-- Big stats -->
                                 <Border Classes="card" Padding="24">
                                     <StackPanel Spacing="16">
                                         <StackPanel Orientation="Horizontal" Spacing="10">
-                                            <TextBlock Text="Aktivan model:" FontSize="13" Foreground="#64748B" />
+                                            <TextBlock Text="Aktivan model:" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" />
                                             <TextBlock Text="{Binding StatsModelType}"
-                                                       FontSize="13" FontWeight="Bold" Foreground="#93C5FD" />
+                                                       FontSize="13" FontWeight="Bold" Foreground="{DynamicResource InfoBrush}" />
                                         </StackPanel>
-                                        <Rectangle Height="1" Fill="#1E3048" />
+                                        <Rectangle Height="1" Fill="{DynamicResource BorderSoftBrush}" />
                                         <ItemsControl ItemsSource="{Binding StatsCards}">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
@@ -545,7 +550,7 @@
                                                     <Border Classes="card-inner" Padding="20 16" Margin="0 0 10 10">
                                                         <StackPanel Spacing="6">
                                                             <TextBlock Text="{Binding Label}"
-                                                                       FontSize="10" Foreground="#475569"
+                                                                       FontSize="10" Foreground="{DynamicResource TextMutedBrush}"
                                                                        LetterSpacing="1.5" FontWeight="Bold" />
                                                             <TextBlock Text="{Binding Value}"
                                                                        FontSize="26" FontWeight="ExtraBold"
@@ -562,25 +567,25 @@
                                 <Border Classes="card" Padding="24">
                                     <StackPanel Spacing="14">
                                         <TextBlock Classes="section-title" Text="OBJAŠNJENJE METRIKA" />
-                                        <Rectangle Height="1" Fill="#1E3048" />
+                                        <Rectangle Height="1" Fill="{DynamicResource BorderSoftBrush}" />
                                         <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
                                             <TextBlock Grid.Row="0" Grid.Column="0" Text="MAPE"
-                                                       FontSize="12" FontWeight="Bold" Foreground="#F97316" />
+                                                       FontSize="12" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" />
                                             <TextBlock Grid.Row="0" Grid.Column="1"
                                                        Text="Mean Absolute Percentage Error – prosječna relativna greška predikcije. Ispod 10% je odlično."
-                                                       FontSize="12" Foreground="#94A3B8" TextWrapping="Wrap" />
-                                            <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Height="1" Fill="#1E3048" Margin="0 8" />
+                                                       FontSize="12" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
+                                            <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Height="1" Fill="{DynamicResource BorderSoftBrush}" Margin="0 8" />
                                             <TextBlock Grid.Row="2" Grid.Column="0" Text="R²"
-                                                       FontSize="12" FontWeight="Bold" Foreground="#38BDF8" />
+                                                       FontSize="12" FontWeight="Bold" Foreground="{DynamicResource InfoBrush}" />
                                             <TextBlock Grid.Row="2" Grid.Column="1"
                                                        Text="Koeficijent determinacije – što bliže 1.0, to model bolje objašnjava varijancu u podacima."
-                                                       FontSize="12" Foreground="#94A3B8" TextWrapping="Wrap" />
-                                            <Rectangle Grid.Row="3" Grid.ColumnSpan="2" Height="1" Fill="#1E3048" Margin="0 8" />
+                                                       FontSize="12" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
+                                            <Rectangle Grid.Row="3" Grid.ColumnSpan="2" Height="1" Fill="{DynamicResource BorderSoftBrush}" Margin="0 8" />
                                             <TextBlock Grid.Row="4" Grid.Column="0" Text="MAE / RMSE"
                                                        FontSize="12" FontWeight="Bold" Foreground="#F59E0B" />
                                             <TextBlock Grid.Row="4" Grid.Column="1"
                                                        Text="Mean Absolute / Root Mean Squared Error – prosječna greška u dolarima. Manji = bolji."
-                                                       FontSize="12" Foreground="#94A3B8" TextWrapping="Wrap" />
+                                                       FontSize="12" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
                                         </Grid>
                                     </StackPanel>
                                 </Border>
@@ -623,6 +628,8 @@
                                     Width="44"
                                     Height="40"
                                     CornerRadius="10"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
                                     Background="{DynamicResource CardInnerBrush}"
                                     Foreground="{DynamicResource TextMainBrush}"
                                     BorderBrush="{DynamicResource BorderSoftBrush}" />
@@ -631,6 +638,8 @@
                                     Width="44"
                                     Height="40"
                                     CornerRadius="10"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
                                     Background="{DynamicResource CardInnerBrush}"
                                     Foreground="{DynamicResource TextMainBrush}"
                                     BorderBrush="{DynamicResource BorderSoftBrush}" />
@@ -639,6 +648,8 @@
                                     MinWidth="72"
                                     Height="40"
                                     CornerRadius="10"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
                                     Background="{DynamicResource CardInnerBrush}"
                                     Foreground="{DynamicResource TextMainBrush}"
                                     BorderBrush="{DynamicResource BorderSoftBrush}" />
@@ -647,6 +658,8 @@
                                     Width="44"
                                     Height="40"
                                     CornerRadius="10"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
                                     Background="{DynamicResource CardInnerBrush}"
                                     Foreground="{DynamicResource TextMainBrush}"
                                     BorderBrush="{DynamicResource BorderSoftBrush}" />
@@ -655,6 +668,8 @@
                                     Width="44"
                                     Height="40"
                                     CornerRadius="10"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
                                     Background="{DynamicResource CardInnerBrush}"
                                     Foreground="{DynamicResource TextMainBrush}"
                                     BorderBrush="{DynamicResource BorderSoftBrush}" />
@@ -663,6 +678,8 @@
                                     Height="40"
                                     Padding="18 0"
                                     CornerRadius="10"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
                                     Background="{DynamicResource AccentBrush}"
                                     Foreground="White"
                                     BorderBrush="{DynamicResource AccentBrush}" />
@@ -706,70 +723,70 @@
                     VerticalAlignment="Center"
                     Padding="36"
                     CornerRadius="20"
-                    Background="#0D1829"
-                    BorderBrush="#2A4060"
+                    Background="{DynamicResource CardBrush}"
+                    BorderBrush="{DynamicResource BorderSoftBrush}"
                     BorderThickness="1.5">
                 <StackPanel Spacing="26">
 
                     <StackPanel Spacing="6" HorizontalAlignment="Center">
                         <TextBlock Text="PROCJENA USPJEŠNA" FontSize="11" FontWeight="Black"
-                                   Foreground="#F97316" HorizontalAlignment="Center" LetterSpacing="2.5" />
+                                   Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" LetterSpacing="2.5" />
                         <TextBlock Text="Rezultat AI analize" FontSize="26" FontWeight="Bold"
-                                   Foreground="White" HorizontalAlignment="Center" />
+                                   Foreground="{DynamicResource TextMainBrush}" HorizontalAlignment="Center" />
                     </StackPanel>
 
-                    <Border Background="#080F1D" CornerRadius="14" Padding="28"
-                            BorderBrush="#1E3048" BorderThickness="1">
+                    <Border Background="{DynamicResource CardInnerBrush}" CornerRadius="14" Padding="28"
+                            BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="1">
                         <StackPanel Spacing="10" HorizontalAlignment="Center">
                             <TextBlock Text="{Binding PredictedPrice}"
                                        FontSize="52" FontWeight="ExtraBold"
-                                       Foreground="#38BDF8" HorizontalAlignment="Center" />
+                                       Foreground="{DynamicResource InfoBrush}" HorizontalAlignment="Center" />
                             <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
-                                <TextBlock Text="Algoritam:" FontSize="12" Foreground="#64748B" />
+                                <TextBlock Text="Algoritam:" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
                                 <TextBlock Text="{Binding ModelUsed}"
-                                           FontSize="12" FontWeight="Bold" Foreground="#E2E8F0" />
+                                           FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
                             </StackPanel>
                         </StackPanel>
                     </Border>
 
                     <StackPanel Spacing="10">
                         <TextBlock Text="DETALJI VOZILA" FontSize="10" FontWeight="Black"
-                                   Foreground="#334155" LetterSpacing="1.5" />
+                                   Foreground="{DynamicResource TextMutedBrush}" LetterSpacing="1.5" />
                         <Grid ColumnDefinitions="*,*">
-                            <TextBlock Text="Marka i model:" FontSize="13" Foreground="#64748B" />
+                            <TextBlock Text="Marka i model:" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" />
                             <StackPanel Grid.Column="1" Orientation="Horizontal"
                                         HorizontalAlignment="Right" Spacing="4">
                                 <TextBlock Text="{Binding SelectedBrand}"
-                                           FontSize="13" FontWeight="Bold" Foreground="#F1F5F9" />
+                                           FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
                                 <TextBlock Text="{Binding SelectedCarModel}"
-                                           FontSize="13" FontWeight="Bold" Foreground="#F1F5F9" />
+                                           FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
                             </StackPanel>
                         </Grid>
-                        <Rectangle Height="1" Fill="#1A2D44" />
+                        <Rectangle Height="1" Fill="{DynamicResource BorderSoftBrush}" />
                         <Grid ColumnDefinitions="*,*">
-                            <TextBlock Text="Godina:" FontSize="13" Foreground="#64748B" />
+                            <TextBlock Text="Godina:" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" />
                             <TextBlock Grid.Column="1" Text="{Binding ModelYear}"
-                                       FontSize="13" FontWeight="Bold" Foreground="#F1F5F9"
+                                       FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"
                                        HorizontalAlignment="Right" />
                         </Grid>
-                        <Rectangle Height="1" Fill="#1A2D44" />
+                        <Rectangle Height="1" Fill="{DynamicResource BorderSoftBrush}" />
                         <Grid ColumnDefinitions="*,*">
-                            <TextBlock Text="Kilometraža:" FontSize="13" Foreground="#64748B" />
+                            <TextBlock Text="Kilometraža:" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" />
                             <TextBlock Grid.Column="1"
                                        Text="{Binding Milage, StringFormat='{}{0:N0} mi'}"
-                                       FontSize="13" FontWeight="Bold" Foreground="#F1F5F9"
+                                       FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}"
                                        HorizontalAlignment="Right" />
                         </Grid>
-                        <Rectangle Height="1" Fill="#1A2D44" />
+                        <Rectangle Height="1" Fill="{DynamicResource BorderSoftBrush}" />
                         <Grid ColumnDefinitions="*,*">
-                            <TextBlock Text="Gorivo / Mjenjač:" FontSize="13" Foreground="#64748B" />
+                            <TextBlock Text="Gorivo / Mjenjač:" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" />
                             <StackPanel Grid.Column="1" Orientation="Horizontal"
                                         HorizontalAlignment="Right" Spacing="4">
                                 <TextBlock Text="{Binding SelectedFuelType}"
-                                           FontSize="13" FontWeight="Bold" Foreground="#F1F5F9" />
-                                <TextBlock Text="/" FontSize="13" Foreground="#475569" />
+                                           FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
+                                <TextBlock Text="/" FontSize="13" Foreground="{DynamicResource TextMutedBrush}" />
                                 <TextBlock Text="{Binding SelectedTransmission}"
-                                           FontSize="13" FontWeight="Bold" Foreground="#F1F5F9" />
+                                           FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextMainBrush}" />
                             </StackPanel>
                         </Grid>
                     </StackPanel>
