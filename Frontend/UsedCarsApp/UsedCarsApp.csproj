@@ -7,6 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>UsedCarsApp</RootNamespace>
     <AssemblyName>UsedCarsApp</AssemblyName>
+    <ApplicationIcon>Assets\autoval-icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

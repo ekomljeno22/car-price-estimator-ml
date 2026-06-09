@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
+using Avalonia;
 using Avalonia.Media.Imaging;
+using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using UsedCarsApp.Models;
@@ -27,6 +29,7 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<string>    CarModels     { get; } = [];
     public ObservableCollection<StatCard>  StatsCards    { get; } = [];
     public ObservableCollection<ChartItem> ChartItems    { get; } = [];
+    public ObservableCollection<ThemeOption> ThemeOptions { get; } = [];
 
     [ObservableProperty] private int    _modelYear            = DateTime.Now.Year - 3;
     [ObservableProperty] private double _milage               = 50_000;
@@ -49,13 +52,26 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool   _showResultPopup;
     [ObservableProperty] private bool   _hasCharts;
     [ObservableProperty] private bool   _isLoadingCharts;
+    [ObservableProperty] private bool   _isChartViewerOpen;
+    [ObservableProperty] private ChartItem? _selectedChart;
+    [ObservableProperty] private double _chartZoom = 1.0;
+    [ObservableProperty] private double _chartImageWidth;
+    [ObservableProperty] private double _chartImageHeight;
+    [ObservableProperty] private ThemeOption? _selectedTheme;
 
     public MainViewModel(ICarApiService api)
     {
         _api = api;
+        LoadThemes();
         _ = LoadOptionsAsync();
         _ = LoadStatsAsync();
     }
+
+    partial void OnSelectedThemeChanged(ThemeOption? value) => ApplyTheme(value);
+
+    partial void OnSelectedChartChanged(ChartItem? value) => UpdateChartImageSize();
+
+    partial void OnChartZoomChanged(double value) => UpdateChartImageSize();
 
     partial void OnSelectedBrandChanged(string value)
     {
@@ -74,6 +90,61 @@ public partial class MainViewModel : ObservableObject
 
     [RelayCommand]
     private void ClosePopup() => ShowResultPopup = false;
+
+    [RelayCommand]
+    private void OpenChart(ChartItem? chart)
+    {
+        if (chart?.ImageSource is null) return;
+
+        SelectedChart = chart;
+        ChartZoom = 1.0;
+        IsChartViewerOpen = true;
+    }
+
+    [RelayCommand]
+    private void CloseChartViewer() => IsChartViewerOpen = false;
+
+    [RelayCommand]
+    private void PreviousChart()
+    {
+        if (ChartItems.Count == 0) return;
+
+        var index = SelectedChart is null ? 0 : ChartItems.IndexOf(SelectedChart);
+        SelectedChart = ChartItems[(index <= 0 ? ChartItems.Count : index) - 1];
+        ChartZoom = 1.0;
+    }
+
+    [RelayCommand]
+    private void NextChart()
+    {
+        if (ChartItems.Count == 0) return;
+
+        var index = SelectedChart is null ? -1 : ChartItems.IndexOf(SelectedChart);
+        SelectedChart = ChartItems[(index + 1) % ChartItems.Count];
+        ChartZoom = 1.0;
+    }
+
+    [RelayCommand]
+    private void ZoomInChart() => ChartZoom = Math.Min(3.0, ChartZoom + 0.25);
+
+    [RelayCommand]
+    private void ZoomOutChart() => ChartZoom = Math.Max(0.5, ChartZoom - 0.25);
+
+    [RelayCommand]
+    private void ResetChartZoom() => ChartZoom = 1.0;
+
+    private void UpdateChartImageSize()
+    {
+        if (SelectedChart?.ImageSource is null)
+        {
+            ChartImageWidth = 0;
+            ChartImageHeight = 0;
+            return;
+        }
+
+        ChartImageWidth = SelectedChart.ImageSource.PixelSize.Width * ChartZoom;
+        ChartImageHeight = SelectedChart.ImageSource.PixelSize.Height * ChartZoom;
+    }
 
     [RelayCommand(CanExecute = nameof(CanPredict))]
     private async Task PredictAsync()
@@ -184,6 +255,60 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    private void LoadThemes()
+    {
+        ThemeOptions.Add(new ThemeOption(
+            "Dark Inferno",
+            ThemeVariant.Dark,
+            "#060B12", "#0D1829", "#0A1520", "#1E3048",
+            "#F8FAFC", "#CBD5E1", "#64748B",
+            "#F97316", "#FB923C", "#38BDF8", "#B0060B12"));
+
+        ThemeOptions.Add(new ThemeOption(
+            "Dark Ocean",
+            ThemeVariant.Dark,
+            "#051316", "#0B2027", "#071A20", "#16404A",
+            "#ECFEFF", "#BAE6FD", "#6B8B96",
+            "#14B8A6", "#2DD4BF", "#F59E0B", "#B0051316"));
+
+        ThemeOptions.Add(new ThemeOption(
+            "Light Sprint",
+            ThemeVariant.Light,
+            "#F8FAFC", "#FFFFFF", "#EEF2F7", "#CBD5E1",
+            "#0F172A", "#334155", "#64748B",
+            "#EA580C", "#F97316", "#0284C7", "#B8F8FAFC"));
+
+        ThemeOptions.Add(new ThemeOption(
+            "Light Mint",
+            ThemeVariant.Light,
+            "#F5FBF7", "#FFFFFF", "#EAF7EF", "#B7DEC6",
+            "#102018", "#315743", "#6B806F",
+            "#059669", "#10B981", "#7C3AED", "#B8F5FBF7"));
+
+        SelectedTheme = ThemeOptions[0];
+    }
+
+    private static void ApplyTheme(ThemeOption? theme)
+    {
+        if (theme is null || Application.Current is null) return;
+
+        Application.Current.RequestedThemeVariant = theme.Variant;
+        SetBrush("AppBackgroundBrush", theme.Background);
+        SetBrush("CardBrush", theme.Card);
+        SetBrush("CardInnerBrush", theme.CardInner);
+        SetBrush("BorderSoftBrush", theme.Border);
+        SetBrush("TextMainBrush", theme.Text);
+        SetBrush("TextSoftBrush", theme.TextSoft);
+        SetBrush("TextMutedBrush", theme.TextMuted);
+        SetBrush("AccentBrush", theme.Accent);
+        SetBrush("AccentHoverBrush", theme.AccentHover);
+        SetBrush("InfoBrush", theme.Info);
+        SetBrush("OverlayBrush", theme.Overlay);
+    }
+
+    private static void SetBrush(string key, string color) =>
+        Application.Current!.Resources[key] = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse(color));
+
 
     private async Task LoadOptionsAsync()
     {
@@ -288,3 +413,21 @@ public partial class MainViewModel : ObservableObject
 }
 
 public sealed record StatCard(string Label, string Value, string Accent);
+
+public sealed record ThemeOption(
+    string Name,
+    ThemeVariant Variant,
+    string Background,
+    string Card,
+    string CardInner,
+    string Border,
+    string Text,
+    string TextSoft,
+    string TextMuted,
+    string Accent,
+    string AccentHover,
+    string Info,
+    string Overlay)
+{
+    public override string ToString() => Name;
+}
