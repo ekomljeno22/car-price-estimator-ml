@@ -56,6 +56,45 @@ public sealed class CarsController(ICarPredictionService svc) : ControllerBase
         return Ok(stats);
     }
 
+
+    [HttpGet("charts")]
+    [ProducesResponseType<ChartsResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status502BadGateway)]
+    public async Task<IActionResult> Charts(CancellationToken ct)
+    {
+        var result = await svc.GetChartsAsync(ct);
+        if (result is null) return StatusCode(502, "ML service returned an empty response.");
+
+        var rewrittenCharts = result.Charts
+            .Select(c => c with { Url = $"/api/cars/charts/{Uri.EscapeDataString(c.Filename)}" })
+            .ToList();
+
+        return Ok(new ChartsResponse(rewrittenCharts));
+    }
+
+    [HttpGet("charts/{filename}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status502BadGateway)]
+    public async Task<IActionResult> ChartImage(string filename, CancellationToken ct)
+    {
+        if (filename.Contains('/') || filename.Contains('\\') || filename.Contains(".."))
+            return BadRequest("Neispravan naziv datoteke.");
+
+        try
+        {
+            var bytes = await svc.GetChartImageAsync(filename, ct);
+            if (bytes is null or { Length: 0 })
+                return StatusCode(502, "ML service returned empty image.");
+
+            return File(bytes, "image/png", filename);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return NotFound($"Graf '{filename}' nije pronađen.");
+        }
+    }
+
     [HttpGet("health")]
     public async Task<IActionResult> Health(CancellationToken ct)
     {

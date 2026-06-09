@@ -11,6 +11,8 @@ public interface ICarApiService
     Task<CarOptions?>           GetOptionsAsync(CancellationToken ct = default);
     Task<IReadOnlyList<string>> GetModelsForBrandAsync(string brand, CancellationToken ct = default);
     Task<ModelStats?>           GetStatsAsync(CancellationToken ct = default);
+    Task<List<ChartDto>?>       GetChartsAsync(CancellationToken ct = default);
+    Task<byte[]?>               GetChartImageAsync(string relativeUrl, CancellationToken ct = default);
 }
 
 public sealed class CarApiService : ICarApiService
@@ -49,4 +51,17 @@ public sealed class CarApiService : ICarApiService
 
     public async Task<ModelStats?> GetStatsAsync(CancellationToken ct = default)
         => await _http.GetFromJsonAsync<ModelStats>("/api/cars/stats", _opts, ct);
+
+    public async Task<List<ChartDto>?> GetChartsAsync(CancellationToken ct = default)
+    {
+        var response = await _http.GetFromJsonAsync<ChartsResponse>("/api/cars/charts", _opts, ct);
+        return response?.Charts;
+    }
+
+    public async Task<byte[]?> GetChartImageAsync(string relativeUrl, CancellationToken ct = default)
+        => await _http.GetByteArrayAsync(relativeUrl, ct);
+
+    private sealed record ChartsResponse(
+        [property: JsonPropertyName("charts")] List<ChartDto> Charts
+    );
 }

@@ -2,10 +2,10 @@ namespace UsedCarsApi.Models;
 
 public record PredictRequest
 (
-    int ModelYear,
-    float Milage,
-    float Hp,
-    float Liters,
+    int    ModelYear,
+    float  Milage,
+    float  Hp,
+    float  Liters,
     string FuelType,
     string Transmission,
     string Accident,
@@ -30,12 +30,12 @@ public record CarOptions(
 );
 
 public record BrandModelsResponse(
-    string               Brand,
+    string                Brand,
     IReadOnlyList<string> Models
 );
 
 public record ModelStats(
-    string ModelType,
+    string  ModelType,
     double? Mae,
     double? Rmse,
     double? R2,
@@ -44,6 +44,16 @@ public record ModelStats(
     double? TrainR2,
     int?    TrainingSamples,
     string? BestModel
+);
+
+public record ChartDto(
+    string Filename,
+    string Label,
+    string Url
+);
+
+public record ChartsResponse(
+    IReadOnlyList<ChartDto> Charts
 );
 
 internal record MlPredictResponse(
@@ -62,12 +72,12 @@ internal record MlOptionsResponse(
 );
 
 internal record MlBrandModelsResponse(
-    string               brand,
+    string                brand,
     IReadOnlyList<string> models
 );
 
 internal record MlStatsResponse(
-    string model_type,
+    string  model_type,
     double? mae,
     double? rmse,
     double? r2,
@@ -76,4 +86,14 @@ internal record MlStatsResponse(
     double? train_r2,
     int?    training_samples,
     string? best_model
+);
+
+internal record MlChartItem(
+    string filename,
+    string label,
+    string url
+);
+
+internal record MlChartsResponse(
+    IReadOnlyList<MlChartItem> charts
 );

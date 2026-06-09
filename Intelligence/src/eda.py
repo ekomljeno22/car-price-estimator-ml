@@ -126,7 +126,7 @@ def run_eda(df):
         print("Spremljeno: results/06_price_by_year.png")
 
     if 'fuel_type' in df.columns:
-        fuel_counts = df['fuel_type'].value_counts().head(10) # Top 10 vrsta goriva radi preglednosti
+        fuel_counts = df['fuel_type'].value_counts().head(10)
         
         plt.figure(figsize=(10, 5))
         sns.barplot(x=fuel_counts.values, y=fuel_counts.index, hue=fuel_counts.index, legend=False, palette='viridis')
